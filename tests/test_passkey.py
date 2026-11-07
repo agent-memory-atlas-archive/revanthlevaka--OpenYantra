@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import secrets
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 from openyantra.core import OpenYantra
@@ -13,9 +13,7 @@ from cognitive_db import CognitiveMemoryStore
 import openyantra.yantra_ui as yui
 from openyantra.yantra_passkey import (
     make_registration_options,
-    check_registration_response,
-    make_authentication_options,
-    check_authentication_response
+    make_authentication_options
 )
 
 @pytest.fixture
@@ -90,7 +88,7 @@ def test_register_verify_and_login(temp_env):
     reg_opt_resp = client.post("/api/passkey/register/options", json={"label": "Key 1"})
     reg_opt_data = reg_opt_resp.json()
     state_id = reg_opt_data["state_id"]
-    challenge = reg_opt_data["options"]["challenge"]
+    reg_opt_data["options"]["challenge"]
     
     # 2. Mock webauthn check verification
     mock_reg_verification = {

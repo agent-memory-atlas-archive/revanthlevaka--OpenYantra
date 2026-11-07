@@ -32,8 +32,6 @@ Usage:
 
 from __future__ import annotations
 
-import hashlib
-import json
 import os
 import sqlite3
 import threading
@@ -628,6 +626,7 @@ class SyncEngine:
                 pass
             return False
 
+        lock_file = None
         try:
             if _PORTALOCKER:
                 lock_file = open(lock_path, "w")
@@ -703,7 +702,7 @@ class SyncEngine:
             tmp.unlink(missing_ok=True)
             return False
         finally:
-            if _PORTALOCKER:
+            if _PORTALOCKER and lock_file is not None:
                 try:
                     portalocker.unlock(lock_file)
                     lock_file.close()
@@ -750,7 +749,7 @@ class SyncEngine:
         )
 
         try:
-            xl = pd.ExcelFile(str(source), engine="odf")
+            pd.ExcelFile(str(source), engine="odf")
             # Import is handled sheet by sheet, merging user changes
             # with SQLite state using request_id deduplication.
             # Full implementation in v3.0.1 -- stub returns OK for now.
@@ -967,7 +966,7 @@ class SyncEngine:
         - Notes containing @Name -> edge to person
         """
         import re
-        now = datetime.utcnow().isoformat(timespec="seconds")
+        datetime.utcnow().isoformat(timespec="seconds")
 
         if table == "tasks":
             project = fields.get("project", "")

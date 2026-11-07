@@ -3,7 +3,6 @@ Unit tests for OpenYantra Nidra Consolidation Engine (v6.0).
 """
 
 import pytest
-from pathlib import Path
 from openyantra.core import OpenYantra
 from openyantra.yantra_nidra import NidraConsolidator
 

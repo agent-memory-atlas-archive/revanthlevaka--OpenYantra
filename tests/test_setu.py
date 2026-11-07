@@ -2,12 +2,12 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import pytest
 import pandas as pd
 
 from openyantra.yantra_sqlite import SyncEngine, validate_ods_headers
-from openyantra.yantra_context import run_context, build_context_markdown
+from openyantra.yantra_context import run_context
 
 @pytest.fixture
 def temp_dir():
@@ -197,19 +197,19 @@ def test_1mb_clipboard_guard(temp_dir, monkeypatch):
     if template_src.exists():
         shutil.copy2(template_src, ods_path)
         
-    engine = SyncEngine(db_path, ods_path)
+    SyncEngine(db_path, ods_path)
     
     # Mock OpenYantra load_session_context to return a very large payload
     # Or just mock build_context_markdown to return a >1MB string
     large_markdown = "A" * (1024 * 1024 + 10)  # > 1MB
     
-    with patch("openyantra.yantra_context.build_context_markdown", return_value=large_markdown) as mock_build, \
+    with patch("openyantra.yantra_context.build_context_markdown", return_value=large_markdown), \
          patch("openyantra.yantra_context.copy_to_clipboard", return_value=True) as mock_copy, \
          patch("openyantra.yantra_context.OpenYantra") as mock_oy:
          
         mock_oy.return_value.compile_context.return_value = {"markdown": large_markdown, "tokens": 1234}
         # Run context on the dummy file
-        markdown_res = run_context(str(ods_path))
+        run_context(str(ods_path))
         
         # Verify fallback file creation
         fallback_file = Path(os.environ.get("OPENYANTRA_DIR", "~/.openyantra")).expanduser() / "active_context.md"

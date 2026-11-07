@@ -76,7 +76,7 @@ def get_oy(oy_path: str) -> OpenYantra:
 # ── Handlers ──────────────────────────────────────────────────────────────────
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    oy_path = context.bot_data.get("oy_path", "")
+    context.bot_data.get("oy_path", "")
     await update.message.reply_text(
         "🪔 *Namaste. I am Chitragupta, your memory keeper.*\n\n"
         "Send me any text and I'll save it to your Inbox.\n\n"

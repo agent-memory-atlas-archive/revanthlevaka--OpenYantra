@@ -3,7 +3,6 @@ Unit tests for OpenYantra Cyberpunk Terminal TUI (v6.1.0).
 """
 
 import pytest
-from pathlib import Path
 from openyantra.core import OpenYantra
 from openyantra.yantra_tui import render_tui
 

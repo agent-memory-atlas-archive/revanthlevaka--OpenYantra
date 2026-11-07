@@ -4,8 +4,6 @@ Tests: edges table, add_edge, delete_edge, get_edges, traverse CTE, infer_edges
 """
 
 import pytest
-import tempfile
-from pathlib import Path
 
 from openyantra.yantra_sqlite import SyncEngine
 
@@ -127,7 +125,6 @@ class TestInferEdges:
 
     def test_infer_mention_edge(self, engine):
         # Insert a person directly (write() requires ledger setup)
-        from contextlib import contextmanager
         with engine._connect() as conn:
             conn.execute(
                 "INSERT INTO people (name, relationship) VALUES (?, ?)",

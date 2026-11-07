@@ -89,7 +89,7 @@ class OpenYantraChatMessageHistory(BaseChatMessageHistory):
         if not self._messages:
             return {"status": "empty"}
 
-        user_msgs = [m.content for m in self._messages if isinstance(m, HumanMessage)]
+        [m.content for m in self._messages if isinstance(m, HumanMessage)]
         ai_msgs = [m.content for m in self._messages if isinstance(m, AIMessage)]
 
         decisions = [f"Assistant response: {ai[:100]}..." for ai in ai_msgs[:3]]

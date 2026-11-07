@@ -3,7 +3,6 @@ Unit tests for OpenYantra Framework Adapters (LangChain, CrewAI) v6.0.
 """
 
 import pytest
-from pathlib import Path
 from openyantra.core import OpenYantra
 from openyantra.adapters.langchain import (
     OpenYantraChatMessageHistory,

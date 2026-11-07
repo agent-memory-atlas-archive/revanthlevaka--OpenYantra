@@ -11,9 +11,7 @@ import os
 import socket
 import subprocess
 import sys
-import threading
 import time
-import urllib.request
 import webbrowser
 from pathlib import Path
 from typing import Optional
@@ -59,7 +57,7 @@ def launch_desktop(
     Launches native desktop window (Dashboard or HUD) using pywebview or browser app mode.
     """
     chitrapat = oy_file or os.environ.get("OPENYANTRA_FILE", str(Path.home() / "openyantra" / "chitrapat.ods"))
-    server_proc = ensure_server_running(chitrapat, port=port)
+    ensure_server_running(chitrapat, port=port)
 
     target_url = f"http://127.0.0.1:{port}/" if mode == "dashboard" else f"http://127.0.0.1:{port}/hud"
 
@@ -68,7 +66,7 @@ def launch_desktop(
 
         if mode == "hud":
             # Floating palette mode
-            window = webview.create_window(
+            webview.create_window(
                 title="OpenYantra HUD",
                 url=target_url,
                 width=640,
@@ -81,7 +79,7 @@ def launch_desktop(
             webview.start()
         else:
             # Full dashboard mode
-            window = webview.create_window(
+            webview.create_window(
                 title=title,
                 url=target_url,
                 width=1200,

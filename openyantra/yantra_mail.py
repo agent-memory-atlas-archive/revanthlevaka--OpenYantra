@@ -6,10 +6,8 @@ A simple SMTP server that listens for incoming emails and routes them to the Inb
 
 import asyncio
 import email
-from email.message import Message
 import argparse
 import os
-import sys
 
 from aiosmtpd.controller import Controller
 from openyantra.core import OpenYantra
@@ -20,9 +18,6 @@ class InboxHandler:
         self.oy = OpenYantra(oy_file)
 
     async def handle_DATA(self, server, session, envelope):
-        peer = session.peer
-        mail_from = envelope.mail_from
-        rcpt_tos = envelope.rcpt_tos
         data = envelope.content
 
         try:
