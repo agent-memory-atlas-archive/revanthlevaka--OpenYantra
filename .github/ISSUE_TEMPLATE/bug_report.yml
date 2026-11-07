@@ -1,0 +1,89 @@
+name: Bug report
+description: Something in OpenYantra is broken or behaving unexpectedly
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve OpenYantra. Please search existing issues first.
+        **Privacy:** never paste your `chitrapat.ods`, `chitrapat.db`, `settings.json`, API keys or tokens. Redact personal memory content in logs.
+  - type: input
+    id: version
+    attributes:
+      label: OpenYantra version
+      description: Output of `yantra --version` or `python -c "import openyantra; print(openyantra.__version__)"`
+      placeholder: "6.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI (yantra commands)
+        - Web dashboard / HUD
+        - Desktop app
+        - Terminal TUI
+        - MCP server / mcp setup
+        - Search (VidyaKosha)
+        - Security (Raksha / passkeys)
+        - Nidra (dream / consolidation)
+        - Obsidian vault sync
+        - Git hook
+        - LangChain / CrewAI adapters
+        - ODS / SQLite sync (Setu)
+        - Installer (install.sh / install.ps1)
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS, Linux, Windows, Other]
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.11.6"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options: [One-line installer, pip install, From source (git clone), Other]
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `yantra ...`
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output / traceback
+      description: Output of `yantra doctor` helps a lot. Redact secrets and personal data.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues
+          required: true
+        - label: I removed API keys and personal memory data from this report
+          required: true

@@ -1,0 +1,20 @@
+name: Question / help
+description: Ask how to use or set up OpenYantra
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: Check the [README](../blob/main/README.md) and [docs/DEPLOYMENT.md](../blob/main/docs/DEPLOYMENT.md) first. Never paste API keys or personal memory data.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What are you trying to do, and what have you tried?
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Version, OS and Python
+      placeholder: "OpenYantra 6.1.0, macOS 14, Python 3.11"
