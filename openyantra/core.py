@@ -406,15 +406,13 @@ class LedgerAgent:
     def _write_sheet(self, sheet_name: str, df: pd.DataFrame):
         existing = {}
         try:
-            xl = pd.ExcelFile(str(self.path), engine="odf")
-            for name in xl.sheet_names:
-                if name != sheet_name:
-                    try:
-                        existing[name] = pd.read_excel(
-                            str(self.path), sheet_name=name,
-                            engine="odf", header=None)
-                    except Exception:
-                        existing[name] = pd.DataFrame()
+            with pd.ExcelFile(str(self.path), engine="odf") as xl:
+                for name in xl.sheet_names:
+                    if name != sheet_name:
+                        try:
+                            existing[name] = xl.parse(name, header=None)
+                        except Exception:
+                            existing[name] = pd.DataFrame()
         except Exception: pass
 
         with pd.ExcelWriter(str(self.path), engine="odf") as writer:

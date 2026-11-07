@@ -89,34 +89,34 @@ def validate_ods_headers(ods_path: str | Path) -> list[str]:
 
     errors = []
     try:
-        xl = pd.ExcelFile(str(path), engine="odf")
-        sheet_names = xl.sheet_names
+        with pd.ExcelFile(str(path), engine="odf") as xl:
+            sheet_names = xl.sheet_names
 
-        canonical_headers = {
-            "👤 Identity": ["Attribute", "Value", "Last Updated", "Notes", "Confidence", "Source", "Importance"],
-            "🎯 Goals": ["Goal", "Type", "Priority", "Deadline", "Status", "Last Updated", "Notes", "Confidence", "Source", "Importance"],
-            "🚀 Projects": ["Project", "Domain", "Status", "Priority", "Key Decision Made", "Next Step", "Last Updated", "Notes", "Confidence", "Source", "Importance"],
-            "👥 People": ["Name", "Relationship", "Context", "Sentiment", "Last Mentioned", "Notes", "Confidence", "Source", "Importance"],
-            "💡 Preferences": ["Category", "Preference", "Strength", "Source", "Notes", "Confidence", "Last Updated", "Importance"],
-            "🧠 Beliefs": ["Topic", "Position", "Confidence", "Domain", "Last Updated", "Notes", "Source", "Importance", "Contradiction_Flag"],
-            "✅ Tasks": ["Task", "Project", "Priority", "Deadline", "Status", "Added By", "Notes", "Confidence", "Source", "Importance"],
-            "🔓 Open Loops": ["Topic", "Context / What's Unresolved", "Opened", "Priority", "Related Project", "Resolved?", "Resolution", "TTL_Days", "Confidence", "Source", "Importance"],
-            "📅 Session Log": ["Date", "Topics Discussed", "Decisions Made", "New Memory Added", "Open Loops Created", "Agent", "Notes"],
-            "⚙️ Agent Config": ["Agent", "Instruction", "Priority", "Active", "Notes"],
-            "📒 Agrasandhanī": ["Timestamp", "Request ID", "Agent", "Sheet", "Operation", "Row Identifier", "Status", "Confidence", "Source", "Importance", "Signature", "Reason / Notes"],
-            "📥 Inbox": ["Content", "Captured", "Routed?", "Target Sheet", "Notes", "Confidence", "Source", "Importance"],
-            "✏️ Corrections": ["Target Sheet", "Row Identifier", "Field", "Proposed Value", "Reason", "Status", "Proposed By", "Proposed At", "Reviewed By", "Reviewed At", "Notes"],
-            "🔒 Quarantine": ["Request ID", "Timestamp", "Agent", "Target Sheet", "Operation", "Fields JSON", "Threat Level", "Threat Type", "Threats Found", "Status", "Reviewed By", "Reviewed At"],
-            "🛡️ Security Log": ["Timestamp", "Agent", "Sheet", "Threat Level", "Threat Type", "Threats", "Status"],
-        }
+            canonical_headers = {
+                "👤 Identity": ["Attribute", "Value", "Last Updated", "Notes", "Confidence", "Source", "Importance"],
+                "🎯 Goals": ["Goal", "Type", "Priority", "Deadline", "Status", "Last Updated", "Notes", "Confidence", "Source", "Importance"],
+                "🚀 Projects": ["Project", "Domain", "Status", "Priority", "Key Decision Made", "Next Step", "Last Updated", "Notes", "Confidence", "Source", "Importance"],
+                "👥 People": ["Name", "Relationship", "Context", "Sentiment", "Last Mentioned", "Notes", "Confidence", "Source", "Importance"],
+                "💡 Preferences": ["Category", "Preference", "Strength", "Source", "Notes", "Confidence", "Last Updated", "Importance"],
+                "🧠 Beliefs": ["Topic", "Position", "Confidence", "Domain", "Last Updated", "Notes", "Source", "Importance", "Contradiction_Flag"],
+                "✅ Tasks": ["Task", "Project", "Priority", "Deadline", "Status", "Added By", "Notes", "Confidence", "Source", "Importance"],
+                "🔓 Open Loops": ["Topic", "Context / What's Unresolved", "Opened", "Priority", "Related Project", "Resolved?", "Resolution", "TTL_Days", "Confidence", "Source", "Importance"],
+                "📅 Session Log": ["Date", "Topics Discussed", "Decisions Made", "New Memory Added", "Open Loops Created", "Agent", "Notes"],
+                "⚙️ Agent Config": ["Agent", "Instruction", "Priority", "Active", "Notes"],
+                "📒 Agrasandhanī": ["Timestamp", "Request ID", "Agent", "Sheet", "Operation", "Row Identifier", "Status", "Confidence", "Source", "Importance", "Signature", "Reason / Notes"],
+                "📥 Inbox": ["Content", "Captured", "Routed?", "Target Sheet", "Notes", "Confidence", "Source", "Importance"],
+                "✏️ Corrections": ["Target Sheet", "Row Identifier", "Field", "Proposed Value", "Reason", "Status", "Proposed By", "Proposed At", "Reviewed By", "Reviewed At", "Notes"],
+                "🔒 Quarantine": ["Request ID", "Timestamp", "Agent", "Target Sheet", "Operation", "Fields JSON", "Threat Level", "Threat Type", "Threats Found", "Status", "Reviewed By", "Reviewed At"],
+                "🛡️ Security Log": ["Timestamp", "Agent", "Sheet", "Threat Level", "Threat Type", "Threats", "Status"],
+            }
 
-        for sheet, expected_cols in canonical_headers.items():
-            if sheet in sheet_names:
-                df = pd.read_excel(str(path), sheet_name=sheet, engine="odf", nrows=0)
-                actual_cols = [str(c).strip() for c in df.columns]
-                missing = [col for col in expected_cols if col not in actual_cols]
-                if missing:
-                    errors.append(f"Sheet '{sheet}' is missing columns: {', '.join(missing)}")
+            for sheet, expected_cols in canonical_headers.items():
+                if sheet in sheet_names:
+                    df = xl.parse(sheet, nrows=0)
+                    actual_cols = [str(c).strip() for c in df.columns]
+                    missing = [col for col in expected_cols if col not in actual_cols]
+                    if missing:
+                        errors.append(f"Sheet '{sheet}' is missing columns: {', '.join(missing)}")
     except Exception as e:
         errors.append(f"Error reading ODS file: {e}")
 
@@ -655,17 +655,15 @@ class SyncEngine:
                     df.to_excel(writer, sheet_name=sheet_name, index=False)
 
             # Verify: count rows in tmp against SQLite
-            tmp_xl = pd.ExcelFile(str(tmp), engine="odf")
-            ok     = True
-            for table, (sheet_name, _) in sheet_map.items():
-                if sheet_name in tmp_xl.sheet_names:
-                    sqlite_count = len(self.read(table))
-                    ods_count    = len(pd.read_excel(
-                        str(tmp), sheet_name=sheet_name,
-                        engine="odf", header=0))
-                    if ods_count != sqlite_count:
-                        ok = False
-                        break
+            ok = True
+            with pd.ExcelFile(str(tmp), engine="odf") as tmp_xl:
+                for table, (sheet_name, _) in sheet_map.items():
+                    if sheet_name in tmp_xl.sheet_names:
+                        sqlite_count = len(self.read(table))
+                        ods_count = len(tmp_xl.parse(sheet_name=sheet_name, header=0))
+                        if ods_count != sqlite_count:
+                            ok = False
+                            break
 
             if ok:
                 os.replace(str(tmp), str(target))
@@ -686,7 +684,10 @@ class SyncEngine:
                         )
                 except Exception:
                     pass
-                tmp.unlink(missing_ok=True)
+                try:
+                    tmp.unlink(missing_ok=True)
+                except Exception:
+                    pass
                 return False
 
         except Exception as e:
@@ -699,7 +700,10 @@ class SyncEngine:
                     )
             except Exception:
                 pass
-            tmp.unlink(missing_ok=True)
+            try:
+                tmp.unlink(missing_ok=True)
+            except Exception:
+                pass
             return False
         finally:
             if _PORTALOCKER and lock_file is not None:
@@ -749,7 +753,8 @@ class SyncEngine:
         )
 
         try:
-            pd.ExcelFile(str(source), engine="odf")
+            with pd.ExcelFile(str(source), engine="odf") as xl:
+                pass
             # Import is handled sheet by sheet, merging user changes
             # with SQLite state using request_id deduplication.
             # Full implementation in v3.0.1 -- stub returns OK for now.

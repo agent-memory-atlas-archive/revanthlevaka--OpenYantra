@@ -43,21 +43,20 @@ except ImportError:
 def detect_version(path: str) -> str:
     """Detect the schema version of a Chitrapat file."""
     try:
-        xl = pd.ExcelFile(path, engine="odf")
-        sheets = set(xl.sheet_names)
+        with pd.ExcelFile(path, engine="odf") as xl:
+            sheets = set(xl.sheet_names)
 
-        if "🛡️ Security Log" in sheets or "📊 Stats" in sheets:
-            # Check for v2.9+ additions
-            try:
-                df = pd.read_excel(path, sheet_name="🔓 Open Loops",
-                                   engine="odf", header=0)
-                if "📒 Agrasandhanī" in sheets and "🔒 Quarantine" in sheets:
-                    # Could be 2.9, 2.10, 2.11, 2.12 -- check Security Log
-                    if "🛡️ Security Log" in sheets:
-                        return "2.9+"
-                return "2.4+"
-            except Exception:
-                return "2.4+"
+            if "🛡️ Security Log" in sheets or "📊 Stats" in sheets:
+                # Check for v2.9+ additions
+                try:
+                    df = xl.parse("🔓 Open Loops", header=0)
+                    if "📒 Agrasandhanī" in sheets and "🔒 Quarantine" in sheets:
+                        # Could be 2.9, 2.10, 2.11, 2.12 -- check Security Log
+                        if "🛡️ Security Log" in sheets:
+                            return "2.9+"
+                    return "2.4+"
+                except Exception:
+                    return "2.4+"
         if "🔒 Quarantine" in sheets:
             return "2.4+"
         if "📥 Inbox" in sheets:
@@ -303,24 +302,16 @@ def _add_column(path: str, sheet_name: str, column: str, default: str = ""):
 
 def _add_sheet(path: str, sheet_name: str, columns: list[str]):
     """Add a new sheet if it doesn't already exist."""
-    try:
-        xl = pd.ExcelFile(path, engine="odf")
-        if sheet_name in xl.sheet_names:
-            return  # Already exists
-    except Exception:
-        pass
-
-    # Read all existing sheets
     existing = {}
     try:
-        xl = pd.ExcelFile(path, engine="odf")
-        for name in xl.sheet_names:
-            try:
-                existing[name] = pd.read_excel(
-                    path, sheet_name=name, engine="odf",
-                    header=None, dtype=str)
-            except Exception:
-                existing[name] = pd.DataFrame()
+        with pd.ExcelFile(path, engine="odf") as xl:
+            if sheet_name in xl.sheet_names:
+                return  # Already exists
+            for name in xl.sheet_names:
+                try:
+                    existing[name] = xl.parse(name, header=None, dtype=str)
+                except Exception:
+                    existing[name] = pd.DataFrame()
     except Exception:
         pass
 
@@ -337,15 +328,13 @@ def _write_sheet(path: str, sheet_name: str, df: pd.DataFrame):
     """Write a single sheet, preserving all others."""
     existing = {}
     try:
-        xl = pd.ExcelFile(path, engine="odf")
-        for name in xl.sheet_names:
-            if name != sheet_name:
-                try:
-                    existing[name] = pd.read_excel(
-                        path, sheet_name=name, engine="odf",
-                        header=None, dtype=str)
-                except Exception:
-                    existing[name] = pd.DataFrame()
+        with pd.ExcelFile(path, engine="odf") as xl:
+            for name in xl.sheet_names:
+                if name != sheet_name:
+                    try:
+                        existing[name] = xl.parse(name, header=None, dtype=str)
+                    except Exception:
+                        existing[name] = pd.DataFrame()
     except Exception:
         pass
 

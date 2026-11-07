@@ -366,29 +366,27 @@ class Raksha:
         findings = []
         try:
             import pandas as pd
-            xl = pd.ExcelFile(str(oy_path), engine="odf")
-
-            for sheet_name in xl.sheet_names:
-                try:
-                    df = pd.read_excel(str(oy_path), sheet_name=sheet_name,
-                                       engine="odf", header=0, dtype=str)
-                    for idx, row in df.iterrows():
-                        row_text = " ".join(
-                            str(v) for v in row.values() if v and str(v) != "nan"
-                        )
-                        result = self._scan(row_text, "audit",
-                                            context=f"audit:{sheet_name}")
-                        if not result.is_clean:
-                            findings.append({
-                                "sheet":         sheet_name,
-                                "row":           idx,
-                                "threat_level":  result.threat_level.value,
-                                "threat_type":   result.threat_type.value if result.threat_type else None,
-                                "threats_found": result.threats_found,
-                                "preview":       row_text[:100],
-                            })
-                except Exception:
-                    pass
+            with pd.ExcelFile(str(oy_path), engine="odf") as xl:
+                for sheet_name in xl.sheet_names:
+                    try:
+                        df = xl.parse(sheet_name, header=0, dtype=str)
+                        for idx, row in df.iterrows():
+                            row_text = " ".join(
+                                str(v) for v in row.values() if v and str(v) != "nan"
+                            )
+                            result = self._scan(row_text, "audit",
+                                                context=f"audit:{sheet_name}")
+                            if not result.is_clean:
+                                findings.append({
+                                    "sheet":         sheet_name,
+                                    "row":           idx,
+                                    "threat_level":  result.threat_level.value,
+                                    "threat_type":   result.threat_type.value if result.threat_type else None,
+                                    "threats_found": result.threats_found,
+                                    "preview":       row_text[:100],
+                                })
+                    except Exception:
+                        pass
 
             # Check Agrasandhanī for tampered signatures
             try:
@@ -631,15 +629,14 @@ def run_security_audit(oy_path: str) -> None:
 def _count_rows(oy_path: str) -> int:
     try:
         import pandas as pd
-        xl = pd.ExcelFile(oy_path, engine="odf")
         total = 0
-        for sheet in xl.sheet_names:
-            try:
-                df = pd.read_excel(oy_path, sheet_name=sheet,
-                                   engine="odf", header=0)
-                total += len(df)
-            except Exception:
-                pass
+        with pd.ExcelFile(oy_path, engine="odf") as xl:
+            for sheet in xl.sheet_names:
+                try:
+                    df = xl.parse(sheet, header=0)
+                    total += len(df)
+                except Exception:
+                    pass
         return total
     except Exception:
         return 0

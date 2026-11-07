@@ -168,8 +168,8 @@ def test_ods_header_validation(temp_dir):
     
     # Write it back to a modified ODS
     # We must write all sheets or at least the modified one
-    xl = pd.ExcelFile(str(ods_path), engine="odf")
-    sheets = {name: pd.read_excel(str(ods_path), sheet_name=name, engine="odf") for name in xl.sheet_names}
+    with pd.ExcelFile(str(ods_path), engine="odf") as xl:
+        sheets = {name: xl.parse(name) for name in xl.sheet_names}
     sheets["👤 Identity"] = df
     
     with pd.ExcelWriter(str(ods_path), engine="odf") as writer:
