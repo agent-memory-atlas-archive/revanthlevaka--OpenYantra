@@ -11,6 +11,8 @@ import shutil
 import sys
 from pathlib import Path
 from typing import Optional
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 
 def detect_client_configs() -> dict[str, Optional[Path]]:
@@ -74,7 +76,7 @@ def setup_mcp_config(
         try:
             shutil.copy2(path, bak_path)
         except Exception:
-            pass
+            _oy_log.debug("ignored error", exc_info=True)
 
         try:
             with open(path, "r", encoding="utf-8") as f:

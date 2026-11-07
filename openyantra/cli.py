@@ -17,6 +17,8 @@ if str(pkg_dir) not in sys.path:
     sys.path.insert(0, str(pkg_dir))
 
 from openyantra.core import OpenYantra, run_bootstrap_interview, __version__
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 def get_oy_file(args):
     return os.environ.get("OPENYANTRA_FILE", args.file)
@@ -118,7 +120,7 @@ def stop_background_servers():
                                     subprocess.run(["taskkill", "/F", "/PID", str(pid)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                                     stopped.append(f"{target} (PID {pid})")
                                 except Exception:
-                                    pass
+                                    _oy_log.debug("ignored error", exc_info=True)
             except Exception as e:
                 print(f"Error listing processes: {e}")
 

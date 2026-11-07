@@ -27,6 +27,8 @@ import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 __version__ = "6.2.0"
 
@@ -143,7 +145,7 @@ def _is_worth_remembering(fields: dict, sheet: str) -> tuple[bool, str]:
         if int(importance) < 2:
             return False, f"importance too low: {importance}"
     except (ValueError, TypeError):
-        pass
+        _oy_log.debug("ignored error", exc_info=True)
 
     return True, "admitted"
 
@@ -342,7 +344,7 @@ class LedgerAgent:
                             req.confidence != "High"):
                         return {"field": field, "existing": str(row[field]),
                                 "requested": str(new_val)}
-        except Exception: pass
+        except Exception: _oy_log.debug("ignored error", exc_info=True)
         return None
 
     def _seal(self, req: WriteRequest) -> str:
@@ -413,7 +415,7 @@ class LedgerAgent:
                             existing[name] = xl.parse(name, header=None)
                         except Exception:
                             existing[name] = pd.DataFrame()
-        except Exception: pass
+        except Exception: _oy_log.debug("ignored error", exc_info=True)
 
         with pd.ExcelWriter(str(self.path), engine="odf") as writer:
             for name, sdf in existing.items():
@@ -440,7 +442,7 @@ class LedgerAgent:
             ledger_df = pd.concat([ledger_df, pd.DataFrame([entry])],
                                    ignore_index=True)
             self._write_sheet(SHEET_LEDGER, ledger_df)
-        except Exception: pass
+        except Exception: _oy_log.debug("ignored error", exc_info=True)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -485,9 +487,9 @@ class OpenYantra:
                             s_data = json.load(f)
                         embedder_pref = s_data.get("embedder", "auto")
                     except Exception:
-                        pass
+                        _oy_log.debug("ignored error", exc_info=True)
                 self._vidyakosha = _VK(str(self.path.parent), embedder_pref=embedder_pref)
-            except Exception: pass
+            except Exception: _oy_log.debug("ignored error", exc_info=True)
 
         # Raksha -- security engine (v2.4)
         self._raksha = get_raksha() if _RAKSHA_AVAILABLE else None
@@ -499,7 +501,7 @@ class OpenYantra:
             db_p = self.path.with_suffix(".db")
             self.db_engine = SyncEngine(db_p, self.path)
         except Exception:
-            pass
+            _oy_log.debug("ignored error", exc_info=True)
 
     # ── Bootstrap ──────────────────────────────────────────────────────────────
 
@@ -565,7 +567,7 @@ class OpenYantra:
                         req.request_id, row_text, req.sheet)
                 else:
                     self._vidyakosha.sync(self.path)
-            except Exception: pass
+            except Exception: _oy_log.debug("ignored error", exc_info=True)
 
         # v5.0.0: Sutradhar auto-edge inference
         if receipt.get("status") == "written" and self.db_engine is not None:
@@ -575,7 +577,7 @@ class OpenYantra:
                 if table:
                     self.db_engine.infer_edges(table, req.fields)
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
 
         return receipt
 
@@ -745,7 +747,7 @@ class OpenYantra:
                                      f"Resolve, delegate, or archive?",
                     })
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
         return expired
 
     def health_check(self) -> dict:
@@ -1064,7 +1066,7 @@ class OpenYantra:
                         s_data = json.load(f)
                     embedder_pref = s_data.get("embedder", "auto")
                 except Exception:
-                    pass
+                    _oy_log.debug("ignored error", exc_info=True)
             self._vidyakosha = _VK(str(self.path.parent), embedder_pref=embedder_pref)
             self._vidyakosha.sync(self.path)
         if snapshot_mode is None and _get_snap_mode:
@@ -1293,7 +1295,7 @@ class OpenYantra:
             }
             df = _pd.concat([df, _pd.DataFrame([entry])], ignore_index=True)
             self._ledger._write_sheet(SHEET_QUARANTINE, df)
-        except Exception: pass
+        except Exception: _oy_log.debug("ignored error", exc_info=True)
 
     def _log_security(self, req: WriteRequest, scan) -> None:
         """Log suspicious (allowed) write to Security Log."""
@@ -1313,7 +1315,7 @@ class OpenYantra:
             }
             df = _pd.concat([df, _pd.DataFrame([entry])], ignore_index=True)
             self._ledger._write_sheet(SHEET_SECURITY_LOG, df)
-        except Exception: pass
+        except Exception: _oy_log.debug("ignored error", exc_info=True)
 
 
     def stats(self) -> dict:
@@ -1609,7 +1611,7 @@ class OpenYantra:
                     lines.append("")
                     lines.append(oracle_text)
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
 
         # ── Streak counter ────────────────────────────────────────────────────
         sessions = oy._read_sheet(SHEET_SESSION_LOG)
@@ -1847,7 +1849,7 @@ class OpenYantra:
                                input=md.encode(), check=True)
                 copied = True
         except Exception:
-            pass
+            _oy_log.debug("ignored error", exc_info=True)
 
         if copied:
             print("[OpenYantra] Context copied to clipboard. Paste into any AI chat.")
@@ -1874,7 +1876,7 @@ class OpenYantra:
                 with open(settings_path, "r", encoding="utf-8") as f:
                     settings = json.load(f)
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
         compiler = SutraCompiler(self, settings)
         return compiler.compile(query_text, budget, mode, sections)
 
@@ -2031,7 +2033,7 @@ class OpenYantra:
                         "action":  "Resolve, delegate, or extend TTL",
                     })
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
 
         # 7 -- Tasks linked to Completed/Cancelled projects
         inactive_projects = {

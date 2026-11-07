@@ -46,6 +46,8 @@ from openyantra.yantra_passkey import (
     make_authentication_options,
     check_authentication_response
 )
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 app = FastAPI(title="OpenYantra", version="6.2.0", docs_url=None, redoc_url=None)
 _oy = None
@@ -736,7 +738,7 @@ async def api_nidra_consolidate(req: Request):
     try:
         data = await req.json()
     except Exception:
-        pass
+        _oy_log.debug("ignored error", exc_info=True)
     dry_run = bool(data.get("dry_run", False))
     provider = str(data.get("provider", "auto"))
 

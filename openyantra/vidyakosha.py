@@ -50,6 +50,8 @@ from typing import Optional
 import faiss
 import numpy as np
 import pandas as pd
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 # ── Embedding backends ────────────────────────────────────────────────────────
 
@@ -323,7 +325,7 @@ class VidyaKosha:
                         texts.append(text)
                         registry.append(meta)
                 except Exception:
-                    pass  # Sheet may not exist yet
+                    _oy_log.debug("ignored error", exc_info=True)  # Sheet may not exist yet
 
             if not texts:
                 print("[VidyaKosha] No rows to index")
@@ -496,7 +498,7 @@ class VidyaKosha:
                     data = json.loads(snap_path.read_text())
                     return data.get("registry", self._registry)
                 except Exception:
-                    pass
+                    _oy_log.debug("ignored error", exc_info=True)
         return self._registry
 
     def _save(self):
@@ -551,5 +553,5 @@ def get_snapshot_mode(agent_name: str, chitrapat_path: str | Path) -> str:
                 if "live" in instr:
                     return "live"
     except Exception:
-        pass
+        _oy_log.debug("ignored error", exc_info=True)
     return "live"

@@ -12,6 +12,8 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 
 class VaultSync:
@@ -218,14 +220,14 @@ class VaultSync:
                             self.oy.resolve_open_loop(topic, resolution="Checked off in Obsidian Vault")
                             loops_resolved.append(topic)
                         except Exception:
-                            pass
+                            _oy_log.debug("ignored error", exc_info=True)
                 elif not checked:
                     # New unchecked item added by user in Obsidian
                     try:
                         self.oy.flush_open_loop(topic=topic, context="Imported from Obsidian Vault Open Loops.md")
                         new_loops_created.append(topic)
                     except Exception:
-                        pass
+                        _oy_log.debug("ignored error", exc_info=True)
 
         # 2. Check for an optional Inbox.md in the vault
         inbox_imported = []
@@ -240,7 +242,7 @@ class VaultSync:
                         self.oy.inbox(clean_line, source="User-stated")
                         inbox_imported.append(clean_line)
                     except Exception:
-                        pass
+                        _oy_log.debug("ignored error", exc_info=True)
 
 
         return {
