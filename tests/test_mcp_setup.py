@@ -1,8 +1,6 @@
 import json
-import os
 import tempfile
 from pathlib import Path
-import pytest
 
 from openyantra.mcp_setup import setup_mcp_config, detect_client_configs
 

@@ -3,7 +3,6 @@ Unit tests for OpenYantra Dashboard FastAPI Endpoints (v6.0).
 """
 
 import pytest
-from pathlib import Path
 from starlette.testclient import TestClient
 from openyantra.core import OpenYantra
 from openyantra.yantra_ui import app, set_oy

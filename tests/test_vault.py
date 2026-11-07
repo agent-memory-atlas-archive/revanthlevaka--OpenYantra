@@ -3,7 +3,6 @@ Unit tests for OpenYantra Obsidian Vault Sync (v6.0).
 """
 
 import pytest
-from pathlib import Path
 from openyantra.core import OpenYantra
 from openyantra.yantra_vault import VaultSync
 

@@ -13,6 +13,7 @@ v6.2.0:
 
 from __future__ import annotations
 import argparse, sys, os, json
+import logging as _logging
 from typing import Optional
 from datetime import datetime
 from pathlib import Path
@@ -371,7 +372,7 @@ async def post_register_options(req: Request):
         d = await req.json()
     except Exception:
         d = {}
-    label = d.get("label", "My Authenticator")
+    d.get("label", "My Authenticator")
     
     settings = get_settings_data()
     rp_id = req.url.hostname or "localhost"
@@ -652,8 +653,9 @@ async def api_oracle():
     try:
         insights = oy.oracle(max_insights=8)
         return {"insights": insights, "count": len(insights)}
-    except Exception as e:
-        return {"insights": [], "count": 0, "error": str(e)}
+    except Exception:
+        _logging.getLogger("openyantra").exception("oracle failed")
+        return {"insights": [], "count": 0, "error": "oracle failed; see the server log"}
 
 
 @app.get("/api/export")
@@ -667,8 +669,9 @@ async def api_export(sheet: str = "", fmt: str = "markdown", since: str = ""):
             since=since or None,
         )
         return {"content": result, "format": fmt, "sheet": sheet or "all"}
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception:
+        _logging.getLogger("openyantra").exception("export failed")
+        return {"error": "export failed; see the server log"}
 
 
 @app.get("/api/mcp-config")
@@ -754,7 +757,10 @@ async def api_vault_sync(req: Request):
         pass
     vault_path = data.get("path", "~/openyantra_vault")
     from openyantra.yantra_vault import VaultSync
-    sync = VaultSync(oy, vault_path)
+    try:
+        sync = VaultSync(oy, vault_path)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
     imp_res = sync.import_vault()
     exp_res = sync.export_vault()
     return {

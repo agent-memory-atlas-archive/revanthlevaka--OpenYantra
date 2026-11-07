@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import math
 from datetime import datetime
-from pathlib import Path
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -340,7 +339,7 @@ class SutraCompiler:
         sheet_order = ["projects", "loops", "goals", "tasks", "preferences", "beliefs", "people"]
         for sec in sheet_order:
             if sec in grouped:
-                emoji = SECTION_TO_EMOJI[sec]
+                SECTION_TO_EMOJI[sec]
                 # Map section name to appropriate markdown header
                 header_map = {
                     "projects": "### Active Projects",

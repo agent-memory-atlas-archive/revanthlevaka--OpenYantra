@@ -322,7 +322,7 @@ class VidyaKosha:
                         rows.append(meta)
                         texts.append(text)
                         registry.append(meta)
-                except Exception as e:
+                except Exception:
                     pass  # Sheet may not exist yet
 
             if not texts:

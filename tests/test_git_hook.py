@@ -4,7 +4,6 @@ Unit tests for OpenYantra Git Auto-Ingest Hook (v6.1.0).
 
 import os
 import subprocess
-from pathlib import Path
 import pytest
 from openyantra.core import OpenYantra
 from openyantra.yantra_git import find_git_root, install_git_hook, ingest_last_commit

@@ -42,7 +42,7 @@ def generate_digest(oy_path: str, format: str = "terminal") -> str:
     """
     oy      = OpenYantra(oy_path, agent_name="Digest")
     today   = date.today().isoformat()
-    health  = oy.health_check()
+    oy.health_check()
 
     sections = []
 

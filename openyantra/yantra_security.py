@@ -280,7 +280,7 @@ class Raksha:
         cleaned = re.sub(r'\r\n|\n\r|%0d%0a', '\n', cleaned)
 
         # Remove HTML/script tags
-        cleaned = re.sub(r'<script[^>]*>.*?</script>', '', cleaned,
+        cleaned = re.sub(r'<script[^>]*>.*?</script\s*[^>]*>', '', cleaned,
                           flags=re.IGNORECASE | re.DOTALL)
         cleaned = re.sub(r'<[^>]+>', '', cleaned)
 

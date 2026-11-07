@@ -1,4 +1,3 @@
-import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -17,7 +16,7 @@ def temp_dir():
 @pytest.fixture
 def test_oy(temp_dir):
     ods_path = temp_dir / "chitrapat.ods"
-    db_path = temp_dir / "chitrapat.db"
+    temp_dir / "chitrapat.db"
     
     # Copy template
     template_src = Path(__file__).parent.parent / "openyantra" / "chitrapat_template.ods"

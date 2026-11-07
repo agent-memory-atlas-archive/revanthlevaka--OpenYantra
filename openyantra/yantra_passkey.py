@@ -16,18 +16,14 @@ from webauthn import (
 from webauthn.helpers import (
     bytes_to_base64url,
     base64url_to_bytes,
-    generate_challenge,
     generate_user_handle,
     parse_registration_credential_json,
     parse_authentication_credential_json,
 )
 from webauthn.helpers.structs import (
-    RegistrationCredential,
-    AuthenticationCredential,
     AuthenticatorSelectionCriteria,
     UserVerificationRequirement,
-    PublicKeyCredentialDescriptor,
-    AuthenticatorAttachment
+    PublicKeyCredentialDescriptor
 )
 
 def make_registration_options(

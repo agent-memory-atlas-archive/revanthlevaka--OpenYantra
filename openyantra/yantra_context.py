@@ -105,7 +105,7 @@ def build_context_markdown(oy: "OpenYantra",
             topic   = loop.get("Topic", "?")
             context = loop.get("Context / What's Unresolved", "")
             pri     = loop.get("Priority", "?")
-            imp     = loop.get("Importance", 5)
+            loop.get("Importance", 5)
             line    = f"- [{pri}] **{topic}**"
             if context:
                 line += f": {context[:100]}"

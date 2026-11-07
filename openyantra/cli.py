@@ -233,7 +233,7 @@ def main():
         if os.path.exists(oy_file):
             print(f"[+] Found Chitrapat at: {oy_file}")
             try:
-                oy = OpenYantra(oy_file)
+                OpenYantra(oy_file)
                 print("[+] Database integrity OK")
             except Exception as e:
                 print(f"[!] Database error: {e}")

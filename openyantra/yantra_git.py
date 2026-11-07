@@ -104,7 +104,6 @@ def ingest_last_commit(repo_path: Optional[str | Path] = None, oy: Any = None) -
         project_name = git_root.name
 
         if oy:
-            from datetime import date
             notes = f"Repo: {project_name} | Branch: {branch} | Hash: {commit_hash}"
             if changed_files:
                 notes += f" | Files: {', '.join(changed_files[:5])}"

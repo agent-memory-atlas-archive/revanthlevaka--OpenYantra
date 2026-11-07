@@ -1,5 +1,4 @@
-import pytest
-from openyantra.yantra_security import Raksha, get_raksha, ThreatLevel
+from openyantra.yantra_security import get_raksha
 
 def test_redact_secrets_openai():
     raksha = get_raksha()

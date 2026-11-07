@@ -20,6 +20,7 @@ v2.1 additions over v2.0:
 from __future__ import annotations
 
 import hashlib
+import logging as _logging
 import json
 import threading
 import time
@@ -695,7 +696,7 @@ class OpenYantra:
         """
         contradictions = []
         beliefs = self._read_sheet(SHEET_BELIEFS)
-        identity = self._read_sheet(SHEET_IDENTITY)
+        self._read_sheet(SHEET_IDENTITY)
 
         # Simple contradiction detection: same topic, different positions
         by_topic: dict[str, list] = {}
@@ -726,7 +727,7 @@ class OpenYantra:
         """
         expired = []
         loops   = self._read_sheet(SHEET_OPEN_LOOPS)
-        cutoff  = datetime.utcnow() - timedelta(days=default_ttl_days)
+        datetime.utcnow() - timedelta(days=default_ttl_days)
 
         for loop in loops:
             if loop.get("Resolved?") == "Yes":
@@ -785,8 +786,9 @@ class OpenYantra:
                 "vidyakosha":       "available" if _VIDYAKOSHA_AVAILABLE else "not installed",
                 "rows":             sheets_data,
             }
-        except Exception as e:
-            return {"status": "error", "error": str(e)}
+        except Exception:
+            _logging.getLogger("openyantra").exception("health_check failed")
+            return {"status": "error", "error": "health check failed; see the server log"}
 
     # ── Convenience write helpers ──────────────────────────────────────────────
 
@@ -1270,8 +1272,9 @@ class OpenYantra:
                             source="User-stated", importance=8,
                         ))
                         return {"status": "released", "receipt": receipt}
-                except Exception as e:
-                    return {"status": "error", "error": str(e)}
+                except Exception:
+                    _logging.getLogger("openyantra").exception("release_quarantine failed")
+                    return {"status": "error", "error": "release failed; see the server log"}
         return {"status": "not_found"}
 
     def _quarantine(self, req: WriteRequest, scan) -> None:
@@ -1648,7 +1651,6 @@ class OpenYantra:
         Checks if brief has been shown today. Returns True if shown.
         Uses a lightweight marker file so it only fires once per day.
         """
-        import tempfile
         from datetime import date as _d
 
         marker = self.path.parent / f".brief_{_d.today().isoformat()}"
@@ -1728,7 +1730,7 @@ class OpenYantra:
                 topic   = l.get("Topic", "?")
                 context = l.get("Context / What's Unresolved", "")
                 priority = l.get("Priority", "")
-                imp     = l.get("Importance", "")
+                l.get("Importance", "")
                 line = f"- [{priority}] {topic}"
                 if context: line += f" -- {context[:80]}"
                 lines.append(line)

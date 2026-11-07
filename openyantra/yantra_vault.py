@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import os
 import re
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 
 class VaultSync:
@@ -20,7 +21,29 @@ class VaultSync:
 
     def __init__(self, oy: Any, vault_dir: str | Path):
         self.oy = oy
-        self.vault_dir = Path(vault_dir).expanduser().resolve()
+        self.vault_dir = self._checked_dir(vault_dir)
+
+    @staticmethod
+    def _checked_dir(vault_dir: str | Path) -> Path:
+        """Resolve the vault path and keep it inside an allowed root.
+
+        Allowed roots: the user's home, the system temp dir, and any path listed
+        in OPENYANTRA_VAULT_ROOT (os.pathsep separated). Stops a request from
+        pointing the vault at system or other users' directories.
+        """
+        target = Path(vault_dir).expanduser().resolve()
+        roots = [Path.home().resolve(), Path(tempfile.gettempdir()).resolve()]
+        for extra in os.environ.get("OPENYANTRA_VAULT_ROOT", "").split(os.pathsep):
+            if extra.strip():
+                roots.append(Path(extra).expanduser().resolve())
+        for root in roots:
+            try:
+                target.relative_to(root)
+                return target
+            except ValueError:
+                continue
+        raise ValueError("vault path must be inside your home directory "
+                         "(or a root listed in OPENYANTRA_VAULT_ROOT)")
 
     def export_vault(self) -> Dict[str, Any]:
         """

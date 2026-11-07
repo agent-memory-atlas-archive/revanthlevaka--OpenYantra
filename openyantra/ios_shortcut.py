@@ -34,7 +34,6 @@ import argparse
 import json
 import socket
 import sys
-import threading
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
