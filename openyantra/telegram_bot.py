@@ -141,7 +141,10 @@ async def cmd_loops(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_digest(update: Update, context: ContextTypes.DEFAULT_TYPE):
     oy_path = context.bot_data.get("oy_path", "")
     try:
-        from yantra_digest import generate_digest
+        try:
+            from openyantra.yantra_digest import generate_digest
+        except ImportError:
+            from yantra_digest import generate_digest
         msg = generate_digest(oy_path, format="telegram")
     except Exception as e:
         msg = f"Could not generate digest: {e}"

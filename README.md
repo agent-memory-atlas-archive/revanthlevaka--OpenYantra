@@ -7,18 +7,17 @@
 <h4 align="center"><em>यन्त्र -- Inspired by Chitragupta, the Hindu God of Data</em></h4>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-5.0.0-saffron?style=flat-square&color=FF9933" />
-  <img src="https://img.shields.io/badge/Protocol-CC0%201.0-gold?style=flat-square&color=D4AF37" />
-  <img src="https://img.shields.io/badge/Library-MIT-green?style=flat-square" />
-  <img src="https://img.shields.io/badge/Format-.ods%20ISO%2FIEC%2026300-blue?style=flat-square" />
-  <img src="https://img.shields.io/badge/Backend-SQLite%20WAL-orange?style=flat-square" />
-  <img src="https://img.shields.io/badge/Install-One%20Command-brightgreen?style=flat-square" />
-  <img src="https://img.shields.io/badge/Security-Raksha%20Engine-red?style=flat-square&color=DC143C" />
+  <img src="https://img.shields.io/badge/Core%20Engine-v6.2.0-saffron?style=flat-square&color=FF9933" />
+  <img src="https://img.shields.io/badge/Desktop%20App-v1.0.0-blueviolet?style=flat-square" />
+  <img src="https://img.shields.io/badge/MCP-Claude%20%26%20Cursor-success?style=flat-square&color=10b981" />
+  <img src="https://img.shields.io/badge/Obsidian-Bi--Directional%20Sync-purple?style=flat-square" />
+  <img src="https://img.shields.io/badge/Tests-68%2F68%20Passing-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" />
 </p>
 
 <p align="center">
-  <strong>Your personal AI agents remember nothing between sessions. OpenYantra fixes that.</strong><br/>
-  One open-standard file. One trusted writer. Any agent. Any framework. Zero cloud.
+  <strong>Your personal AI agents remember nothing between sessions. OpenYantra fixes that permanently.</strong><br/>
+  One open-standard file. Zero cloud lock-in. Omnipresent Desktop HUD. 1-Click MCP. Local AI sleep consolidation.
 </p>
 
 ---
@@ -31,574 +30,279 @@
 
 ## The Problem -- Why Your AI Forgets
 
-Every time you open a new chat with Claude, ChatGPT, or any AI agent it starts completely blank. It does not know your current projects, your decisions from last week, or what you left unfinished. You repeat yourself every session.
+Every time you open a new chat with Claude, ChatGPT, Cursor, or terminal agents, they start completely blank. They don't know your active projects, architectural decisions from last week, or what you left unfinished. You repeat yourself every session.
 
-When the conversation gets too long, the AI compresses older messages -- your active work context disappears mid-task.
+When conversation context windows fill up, the AI compresses older messages -- your active work context vanishes mid-task.
 
 **OpenYantra solves this permanently:**
 
 | Without OpenYantra | With OpenYantra |
 |---|---|
-| AI starts blank every session | AI knows your projects, goals, preferences |
-| Repeat context every time | Context injected automatically at session start |
-| Unfinished work lost in compaction | Open Loops flushed before compaction, restored after |
-| No record of what agents changed | Every write SHA-256 signed, permanent audit trail |
-| Agents can overwrite each other | Single trusted writer -- no conflicts |
-| Memory lives in a cloud you do not control | Memory lives in a file on your computer |
+| AI starts completely amnesiac every session | AI knows your projects, goals, beliefs, and contacts |
+| Repetitive prompt engineering every day | Dynamic context block compiled & injected in milliseconds |
+| Unfinished work lost in context compaction | Open Loops (Anishtha) flushed before compaction & restored after |
+| Accidental API keys & secrets leak into agent memory | Raksha Credential Redactor automatically sanitizes tokens |
+| Trapped in proprietary vector database clouds | 100% open local files: `.ods` (LibreOffice), `.sqlite`, `.md` |
+| Clunky browser tabs you forget to check | Omnipresent Desktop HUD (`Cmd+Shift+Y`) over Cursor & VS Code |
 
 ---
 
-## What is OpenYantra?
+## ⚡ What's New in v6.1 ("Akasha & Sutra") & Desktop v1.0
 
-OpenYantra is a **personal AI memory system** -- a structured file your AI agents read from and write to, so your context persists across sessions, agents, and time.
+### 1. 🖥️ OpenYantra Desktop & Floating HUD (`Cmd+Shift+Y`)
+No more opening browser tabs. Run `yantra desktop` (or `yantra hud`) to launch an ultra-lightweight native OS HUD (< 15MB binary, zero Electron bloat). Press `Cmd+Shift+Y` to trigger a Raycast/Spotlight-style floating palette directly over Cursor, VS Code, or your terminal.
+- **Instant Capture:** Quick-dump notes with `#project`, `@person`, or `!urgent` tags.
+- **Instant Recall:** Live fuzzy & semantic search across your entire knowledge base.
+- **1-Click Sleep:** Trigger autonomous memory consolidation right from the HUD.
 
-It is:
-- **Local-first** -- your memory file lives on your machine, never in a cloud
-- **Human-readable** -- open it in LibreOffice, read it, edit it like a spreadsheet
-- **Agent-agnostic** -- works with Claude, ChatGPT, OpenClaw, LangChain, AutoGen
-- **Auditable** -- every write signed with SHA-256, permanent audit trail
-- **Protected** -- Raksha security engine blocks prompt injection attempts
-- **Fast** -- v4.0 SQLite WAL backend: 2ms writes at any scale
+### 2. ⚡ 1-Click MCP Auto-Setup for Claude & Cursor (`yantra mcp setup`)
+Zero manual JSON editing. One command auto-detects Claude Desktop and Cursor configurations across macOS, Windows, and Linux, creates a backup, and installs the OpenYantra MCP server seamlessly.
 
-Named after **Chitragupta** (चित्रगुप्त) -- the Hindu God of Data, divine scribe who keeps the complete record of every soul's deeds. The architecture mirrors the mythology precisely: one trusted recorder, one immutable ledger, and a rule that the user's word (Dharma-Adesh) always overrides everything else.
+### 3. 🌙 Autonomous Sleep & Memory Consolidation (Nidra)
+Mimics biological slow-wave sleep. Run `yantra dream` or `yantra consolidate`:
+- **Episodic Clustering:** Clusters recent session logs into macro-milestones and decisions.
+- **Open Loop Auto-Resolution:** Automatically identifies and closes loops resolved during work.
+- **Preference Promotion:** Promotes recurring user preferences (e.g., *"prefers dark mode"*, *"always use python 3.9"*) into foundational `Beliefs & Principles`.
+- **Local Ollama Integration:** Connects to local Ollama (`llama3`, `mistral`, `phi3`) with automatic fallback to deterministic heuristics. Zero cloud dependency.
 
-> *"Your purpose is to stay in the minds of all people and record their thoughts and deeds."*
-> -- Brahma to Chitragupta
+### 4. 📓 Bi-Directional Obsidian Vault Sync (`yantra vault sync`)
+- **Export:** Translates your Chitrapat into clean Obsidian Markdown notes with YAML frontmatter, wikilinks (`[[Projects/X]]`), and task checklists.
+- **Import:** Check off an item (`- [x]`) in Obsidian, and OpenYantra resolves it in the ledger. Add notes in `Inbox.md`, and they are enqueued into your memory bank.
+
+### 5. 🛡️ Raksha Credential & Secret Redactor Guard
+Pre-commit interceptor pattern-matches and redacts Anthropic, OpenAI, AWS, GitHub, Google API keys, Slack tokens, and private keys before committing any record to disk.
+
+### 6. 🐙 Git Commit Auto-Ingest (`yantra hook install`)
+Install a git post-commit hook in your repositories. Every time you commit code, OpenYantra automatically extracts the commit hash, branch, message, and modified files into your `Session Log`.
+
+### 7. 📟 Cyberpunk Terminal TUI (`yantra tui`)
+For command-line purists and SSH workflows. An interactive terminal dashboard displaying live open loops, active projects, recent decisions, and quick-capture hotkeys.
+
+### 8. 🔌 Drop-in Framework Adapters
+First-class Python bindings for:
+- **LangChain:** `OpenYantraChatMessageHistory`, `OpenYantraRetriever`
+- **CrewAI:** `OpenYantraCrewMemory` for multi-agent autonomous teams
 
 ---
 
-## Install in One Command
+## 🚀 Install in One Command
 
-**Mac / Linux** -- fully self-contained. Installs Python, LibreOffice, all dependencies, creates a virtual environment, sets up the CLI, adds a desktop shortcut:
-
+### macOS / Linux:
 ```bash
 curl -sSL https://raw.githubusercontent.com/revanthlevaka/OpenYantra/main/install.sh | bash
 ```
 
-**Windows (PowerShell):**
+### Windows (PowerShell):
 ```powershell
 irm https://raw.githubusercontent.com/revanthlevaka/OpenYantra/main/install.ps1 | iex
 ```
 
-After install:
+### Python Package (Pip):
 ```bash
-yantra bootstrap    # 12-question interview -- sets up your memory
-yantra ui           # opens http://localhost:7331
-yantra morning      # your daily brief
-yantra inbox "text" # quick capture to Inbox
-yantra context      # copy context to clipboard, paste into any AI chat
+git clone https://github.com/revanthlevaka/OpenYantra.git
+cd OpenYantra
+pip install -e ".[full]"
 ```
-
-No API keys required. No cloud account. No configuration files.
 
 ---
 
-## How It Works
+## 🛠️ Quickstart Workflow
 
-`yantra bootstrap` asks you 12 questions -- your name, your projects, your goals, the people you work with, what your AI should never suggest. The answers populate your **Chitrapat** -- a `.ods` spreadsheet you can open in LibreOffice at any time.
+```bash
+# 1. Initialize your personal memory vault (12-question bootstrap interview)
+yantra bootstrap
 
-When you start an AI session, OpenYantra injects a context block into the system prompt:
+# 2. Configure Claude Desktop & Cursor with 1 click
+yantra mcp setup
 
+# 3. Launch the native Desktop HUD (or press Cmd+Shift+Y)
+yantra desktop
+
+# 4. View your Morning Brief in the terminal
+yantra morning
+
+# 5. Quick capture thoughts, tasks, or loops
+yantra inbox "Follow up with Priya regarding the distributed consensus paper"
+
+# 6. Run autonomous sleep consolidation at the end of the day
+yantra dream
+
+# 7. Sync with your Obsidian Vault
+yantra vault sync ~/my_vault
+
+# 8. Launch the Cyberpunk Terminal TUI
+yantra tui
 ```
-[OPENYANTRA CONTEXT -- v5.0.0]
-User: Revanth Levaka | Filmmaker | Hyderabad, IN
-Active Projects: Feature Screenplay -> Write act 2 (High)
-Open Loops: [High] 3-act vs 5-act -- undecided | [Medium] Follow up with Priya
-Goals: Complete debut feature film
-Preferences: Communication: direct | Tools: terminal, LibreOffice
-```
-
-Your AI agent now knows who you are and what is unresolved -- without you saying a word.
 
 ---
 
-## v4.0 -- What Changed
+## 🧭 CLI Command Cheatsheet
 
-v4.0 is the SQLite Foundation release. The architecture is the same -- Chitragupta still controls all writes, the single-writer rule is unchanged. What changed is the storage layer underneath.
+| Command | Action |
+| :--- | :--- |
+| `yantra bootstrap` | Interactive 12-question interview to build your Chitrapat vault |
+| `yantra desktop` | Launch native Desktop App & floating HUD palette (`yantra app` / `yantra hud`) |
+| `yantra tui` | Open interactive Cyberpunk Terminal TUI |
+| `yantra mcp setup` | Auto-configure Claude Desktop and Cursor MCP settings |
+| `yantra mcp serve` | Run the standard MCP JSON-RPC server on stdin/stdout |
+| `yantra dream` | Run autonomous Nidra memory consolidation (`yantra consolidate`) |
+| `yantra vault sync [dir]`| Bi-directional sync with Obsidian Markdown vault (`export` / `import`) |
+| `yantra hook install` | Install Git post-commit auto-ingest hook in current repo |
+| `yantra morning` | Display your daily briefing, streak, and active open loops |
+| `yantra context` | Compile dynamic context and copy Markdown to clipboard |
+| `yantra loops` | List and filter unresolved open loops |
+| `yantra health` | Run complete database integrity and health diagnostics |
+| `yantra doctor` | Verify system environment, SQLite WAL, and vector embedders |
+| `yantra ui [--port 7331]` | Launch the browser-based executive memory dashboard |
 
-| Metric | v2.x (ODS only) | v4.0 (SQLite WAL + ODS export) |
+---
+
+## 🏛️ System Architecture
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        OPENYANTRA UNIFIED ARCHITECTURE                 │
+└────────────────────────────────────────────────────────────────────────┘
+
+  [Omnipresent Inputs]
+    ├── Desktop HUD (Cmd+Shift+Y)  ────► [FastAPI Local REST Engine]
+    ├── System Tray Daemon         ────► [Port 7331 / Unix Socket]
+    ├── Git Post-Commit Hook       ────►          │
+    ├── CLI & Cyberpunk TUI        ────►          │
+    └── IDE / Cursor MCP Client    ────► [Cognitive MCP JSON-RPC]
+                                                  │
+                                                  ▼
+                                     ┌─────────────────────────┐
+                                     │  Raksha Redactor Guard  │ (Sanitizes keys & secrets)
+                                     └────────────┬────────────┘
+                                                  │
+                                                  ▼
+                                     ┌─────────────────────────┐
+                                     │ Chitragupta SyncEngine  │ (Single-writer coordinator)
+                                     └────────────┬────────────┘
+                                                  │
+                  ┌───────────────────────────────┴──────────────────────────────┐
+                  ▼                                                              ▼
+        [SQLite WAL Engine]                                            [Canonical Life Scroll]
+       • < 2ms write latency                                          • `chitrapat.ods`
+       • Sutradhar Graph Edges                                        • ISO/IEC 26300 Open Document
+       • VidyaKosha Vector Index                                      • LibreOffice Human-Readable
+                  │                                                              │
+                  ▼                                                              ▼
+       [Nidra Sleep Engine]                                           [Obsidian Vault Sync]
+       • Episodic log clustering                                      • Markdown with YAML frontmatter
+       • Open Loop auto-pruning                                       • Checkbox bidirectional resolution
+       • Preference to belief promotion                               • Wikilinks [[Projects/X]]
+```
+
+---
+
+## 📜 The 14 Sacred Memory Sheets
+
+OpenYantra stores your life context across 14 dedicated sheets in `chitrapat.ods`:
+
+| Sheet | Sanskrit | What it Stores |
 |---|---|---|
-| Write latency at 200 rows | 78ms | 2ms |
-| Write latency at 1000 rows | 366ms | 2ms |
-| Write latency at 5000 rows | 2012ms | 2ms |
-| Concurrent read safety | Race condition possible | portalocker prevents file corruption |
-| Write idempotency | Manual | request_id dedup built in |
-| ODS file | Live write target | Atomic export (verified against SQLite) |
-
-The ODS file remains the human-readable canonical export. You can still open `chitrapat.ods` in LibreOffice and read everything. User edits via LibreOffice are imported back via `yantra sync`.
-
-**Sort Catastrophe warning:** Sorting a single column in LibreOffice scrambles all row data because ODS rows are not database rows. The v4.0 ODS export includes a Sort Warning sheet explaining this. Use `yantra sync` after any direct ODS edits rather than sorting.
-
----
-
-## The 14-Sheet Memory File
-
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_today.svg" alt="Today Tab" width="100%"/>
-  <em>The Today tab -- daily command centre with Daily Insight card and one-click actions.</em>
-</p>
-
-| Sheet | Sanskrit | What it stores |
-|---|---|---|
-| 👤 Identity | Svarupa | Name, occupation, location, communication style |
+| 👤 Identity | Svarupa | Persona, occupation, communication style, location |
 | 🎯 Goals | Sankalpa | Long and short-term aims with success metrics |
 | 🚀 Projects | Karma | Active work -- domain, status, next concrete step |
-| 👥 People | Sambandha | Relationships, context, open threads with each person |
-| 💡 Preferences | Ruchi | Tools, habits, communication style, anti-goals |
-| 🧠 Beliefs | Vishwas | Values, worldview, belief evolution history |
-| ✅ Tasks | Kartavya | Action items with project link and priority |
-| 🔓 Open Loops ★ | Anishtha | Unresolved threads -- compaction safety net |
-| 📅 Session Log | Dinacharya | Per-session summaries |
-| ⚙️ Agent Config | Niyama | Per-agent instructions |
-| 📒 Agrasandhanī | -- | Immutable audit trail -- every write SHA-256 signed |
-| 📥 Inbox | Avagraha | Quick capture -- categorise later |
-| ✏️ Corrections | Sanshodhan | Agent-proposed edits pending your approval |
-| 🔒 Quarantine | Nirodh | Blocked injection attempts |
-
-**★ Open Loops (Anishtha)** -- unanimously named by all 8 models across 4 stress-test rounds as the strongest and most novel feature. Implements the Zeigarnik Effect as a persistent data structure.
+| 👥 People | Sambandha | Collaborators, relationship context, open threads |
+| 💡 Preferences | Ruchi | Tools, habits, rules, anti-goals |
+| 🧠 Beliefs | Vishwas | Values, worldview, epistemic evolution history |
+| ✅ Tasks | Kartavya | Action items linked to projects with priorities |
+| 🔓 Open Loops ★ | Anishtha | Unresolved threads (Zeigarnik Effect safety net) |
+| 📅 Session Log | Dinacharya | Chronological episodic summaries & git commits |
+| ⚙️ Agent Config | Niyama | Per-agent behavioral guidelines and trust tiers |
+| 📒 Agrasandhanī | -- | Immutable ledger -- every write SHA-256 signed |
+| 📥 Inbox | Avagraha | Quick capture dumping ground -- routed later |
+| ✏️ Corrections | Sanshodhan | Agent-proposed edits pending human approval |
+| 🔒 Quarantine | Nirodh | Blocked prompt injections and quarantined inputs |
 
 ---
 
-## Morning Briefing
+## 🧪 Verification & Test Suite
 
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_morning.svg" alt="Morning Brief" width="100%"/>
-  <em>The morning brief in your terminal -- surfaces what matters before you open any other app.</em>
-</p>
-
-Runs automatically on your first `yantra` command each day:
+OpenYantra maintains a rigorous test suite covering security, vector search, passkey authentication, MCP configuration, Nidra consolidation, and desktop HUD endpoints:
 
 ```bash
-yantra morning
+pytest tests/
 ```
-
 ```
-========================================================
-  Good morning, Revanth. OpenYantra v5.0.0  2026-05-22
-========================================================
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: /Users/revanthlevaka/openyantra
+configfile: pyproject.toml
 
-  🔓  Open Loops (12 total):
-     [High    ] Decide screenplay structure  (2d left)
-     [Medium  ] Follow up with Priya on budget
+tests/test_adapters.py ...                                               [  4%]
+tests/test_bootstrap.py ...                                              [  8%]
+tests/test_cognitive.py .......                                          [ 19%]
+tests/test_desktop.py ..                                                 [ 22%]
+tests/test_git_hook.py ...                                               [ 26%]
+tests/test_mcp_setup.py ...                                              [ 30%]
+tests/test_nidra.py ....                                                 [ 36%]
+tests/test_passkey.py .....                                              [ 44%]
+tests/test_security_sanitizer.py ......                                  [ 52%]
+tests/test_setu.py ....                                                  [ 58%]
+tests/test_sutra.py ....                                                 [ 64%]
+tests/test_sutradhar.py ...............                                  [ 86%]
+tests/test_tui.py .                                                      [ 88%]
+tests/test_ui_api.py .....                                               [ 95%]
+tests/test_vault.py ...                                                  [100%]
 
-  🚀  Stale Projects:
-     Feature Screenplay -- no update in 9 days -> Write act 2
-
-  📥  Inbox: 3 items unrouted
-
-  💡  Suggestion:
-     'budget revision' in Inbox may relate to:
-     'Follow up with Priya on budget'
-
-  🕰️   Past memory:
-     "Creative freedom over short-term money"
-
-  🔥  Streak: 3 days
-  ────────────────────────────────────────────────────
-  yantra ui -> http://localhost:7331
-========================================================
-```
-
-Also appears as the **Daily Insight card** at the top of the browser dashboard.
-
----
-
-## Browser Dashboard
-
-```bash
-yantra ui   # -> http://localhost:7331
-```
-
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_loops.svg" alt="Open Loops Tab" width="100%"/>
-  <em>Open Loops tab -- all unresolved Anishtha with priority and TTL countdown.</em>
-</p>
-
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_timeline.svg" alt="Timeline Tab" width="100%"/>
-  <em>Timeline tab -- every write Chitragupta has ever made, chronologically.</em>
-</p>
-
-| Tab | Purpose |
-|---|---|
-| 🌅 Today | Daily command centre -- Daily Insight card, urgent items, one-click actions |
-| 📥 Inbox | Unrouted captures. Press `i` anywhere to capture instantly. |
-| 🚀 Projects | Active work with status, priority, next step |
-| 🔓 Open Loops | All unresolved threads sorted by importance |
-| ✅ Tasks | Pending action items |
-| 📅 Timeline | Chronological activity feed |
-| ⚡ Conflicts | Visual diff -- agent proposed vs your value. Your choice wins. |
-| ✏️ Corrections | Agent-proposed edits pending approval |
-| 🔒 Security | Quarantine review and threat log |
-| 📒 Ledger | Full SHA-256 signed audit trail |
-| 💚 Health | System status and row counts |
-| 📊 Stats | Memory growth analytics |
-
----
-
-## Security -- Raksha Engine
-
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_security.svg" alt="Security Tab" width="100%"/>
-  <em>Security tab -- quarantine review, threat log, agent trust tiers.</em>
-</p>
-
-Every write scanned before Chitragupta commits it. Only confirmed threats are blocked (permissive mode).
-
-**Protects against:** prompt injection · jailbreak attempts (DAN, STAN) · agent impersonation · Unicode/RTL attacks · schema corruption
-
-| Tier | Who | Treatment |
-|---|---|---|
-| 5 -- User | You | Never blocked -- Dharma-Adesh |
-| 4 -- Chitragupta | System | Full trust |
-| 3 -- Known | Claude, OpenClaw, LangChain, AutoGen | Standard scan |
-| 2 -- Unknown | Unregistered agents | Stricter scan |
-| 1 -- External | Telegram bot, iOS Shortcut, email | Suspicious treated as confirmed |
-| 0 -- Untrusted | Flagged agents | Any flag -> block |
-
----
-
-## Bootstrap Interview
-
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_bootstrap.svg" alt="Bootstrap Interview" width="100%"/>
-  <em>The 12-question bootstrap interview -- populates all key sheets via conversation.</em>
-</p>
-
-```bash
-yantra bootstrap
-```
-
-| # | Question | Sheet populated |
-|---|---|---|
-| 1 | What does your AI always forget? | Sets focus |
-| 2 | Name, occupation, location | Identity |
-| 3 | Life domains (3-5 areas) | Beliefs |
-| 4 | Active projects + next concrete step | Projects |
-| 5 | Goals + how you will measure success | Goals |
-| 6 | Important people + one open thread with each | People + Open Loops |
-| 7 | Preferences, tools, working hours | Preferences |
-| 8 | Anti-goals -- what AI should never suggest | Beliefs |
-| 9 | Decision principles + belief you no longer hold | Beliefs |
-| 10 | Decision you are second-guessing + recurring problem | Open Loops |
-| 11 | Reminder preference | Agent Config |
-| 12 | Live preview of all populated sheets | -- |
-
----
-
-## Memory Analytics
-
-<p align="center">
-  <img src="website/assets/screenshots/screenshot_stats.svg" alt="Stats Tab" width="100%"/>
-  <em>Stats tab -- memory growth, writes by sheet and agent, loop resolution rate.</em>
-</p>
-
-```bash
-yantra stats
-```
-
-Total rows · total writes · writes last 7 / 30 days · open loops · loop resolution rate · high-importance items · writes by agent · writes by sheet.
-
----
-
-## Copy Context -- Paste into Any AI Chat
-
-```bash
-yantra context
-```
-
-Formats your memory as a clean Markdown block and copies to clipboard. Paste into Claude.ai, ChatGPT, or any web-based AI. Bridges your local memory to the AI tools you already use.
-
----
-
-## Mobile Capture
-
-**Telegram bot** (recommended):
-```bash
-export TELEGRAM_BOT_TOKEN="your_token_from_BotFather"
-yantra telegram
-# Any message -> Inbox. /loop /task /goal /digest /health
-```
-
-**iOS Shortcut:**
-```bash
-yantra shortcut
-# Prints your Mac's local IP + exact Shortcut setup instructions
-```
-
-**Email:**
-```bash
-yantra mail
-# Local SMTP on port 2525 -- forward any email -> Inbox
+================== 68 passed, 4 warnings in 96.69s (0:01:36) ===================
 ```
 
 ---
 
-## Quick Start (Python)
+## 📸 Screenshots & Visual Experience
 
-```python
-from openyantra import OpenYantra
+| Today Command Centre | Live Web Dashboard |
+|:---:|:---:|
+| <img src="assets/screenshots/screenshot_today.svg" alt="Today Tab" width="100%"/> | <img src="assets/screenshots/screenshot_webui.svg" alt="Web UI" width="100%"/> |
 
-oy = OpenYantra("~/openyantra/chitrapat.ods", agent_name="Claude")
-
-# Inject into system prompt at session start
-system_prompt = oy.build_system_prompt_block()
-
-# Write via Chitragupta
-oy.add_project("My Film", domain="Creative", status="Active",
-               priority="High", next_step="Write act 2", importance=9)
-oy.flush_open_loop("Structure decision", "3-act vs 5-act undecided",
-                   priority="High", ttl_days=30)
-
-# Quick capture to Inbox
-oy.inbox("Priya mentioned budget revision needed by Friday")
-
-# Semantic search -- importance-weighted results
-results = oy.search("screenplay structure")
-
-# Copy context for web AI tools
-md = oy.build_context_markdown()
-
-# Session end
-oy.log_session(topics=["screenplay"], decisions=["Research 5-act"])
-```
+| Terminal Cyberpunk TUI | Open Loops (Anishtha) |
+|:---:|:---:|
+| <img src="assets/screenshots/screenshot_cli.svg" alt="CLI TUI" width="100%"/> | <img src="assets/screenshots/screenshot_loops.svg" alt="Loops" width="100%"/> |
 
 ---
 
-## All CLI Commands
+## ⚖️ How OpenYantra Compares
 
-```bash
-# Setup
-yantra bootstrap    # 12-question interview
-yantra doctor       # system check: Python, packages, port, ODS integrity
-
-# Daily use
-yantra morning      # daily brief -- runs automatically on first command of day
-yantra ui [port]    # browser dashboard -> http://localhost:7331
-yantra context      # copy full context to clipboard -- paste into any AI chat
-yantra inbox "text" # quick capture to Inbox
-yantra digest       # daily summary: loops + stale projects + insights
-yantra stats        # memory growth analytics
-
-# Memory management
-yantra health       # stats overview
-yantra route        # auto-route all unprocessed Inbox items
-yantra loops        # list all unresolved Open Loops
-yantra diff         # belief contradiction check
-yantra ttl          # check expired Open Loops
-yantra sync         # import ODS edits back into SQLite (after editing in LibreOffice)
-yantra corrections  # list and apply pending agent corrections
-
-# Mobile
-yantra telegram     # Telegram bot -> Inbox
-yantra shortcut     # iOS Shortcut server (port 7332)
-yantra mail         # Email-to-Inbox SMTP (port 2525)
-yantra schedule     # schedule daily digest via launchd / cron
-
-# Maintenance
-yantra integrity    # verify all Agrasandhani SHA-256 signatures
-yantra archive      # rotate old session logs to archive file
-yantra migrate      # upgrade older Chitrapat to current schema
-yantra security     # full Chitrapat security audit
-yantra open         # open Chitrapat in LibreOffice
-yantra version      # show version
-```
+| Dimension / Capability | Living Brain (`livingbrain.com`) | Mem0 / Zep | **OpenYantra (v6.2)** |
+| :--- | :---: | :---: | :---: |
+| **Hosting Model** | Proprietary Cloud SaaS | Cloud SaaS / Complex Self-Host | **100% Local-First / Zero Cloud** |
+| **Data Sovereignty & Privacy** | Third-party cloud servers | Third-party cloud servers | **Your device only (Offline SQLite & ODS)** |
+| **Human Editability & Transparency**| API / Closed web dashboard | Closed JSON / Vector embeddings | **Open spreadsheet (`.ods`), Obsidian Markdown** |
+| **Desktop Ergonomics** | Browser dashboard | Browser dashboard | **Floating HUD (`Cmd+Shift+Y`), Cyberpunk TUI** |
+| **Secret & Credential Redactor** | ❌ (Raw context sent over wire) | ❌ (Requires manual masking) | **✅ Raksha automatic regex sanitizer** |
+| **Sleep & Memory Consolidation** | Cloud background job | ⚠️ Basic clustering | **✅ Local Ollama Nidra Consolidation** |
+| **Obsidian Vault Sync** | ❌ None | ❌ None | **✅ Bi-directional Markdown & `- [x]` sync** |
+| **1-Click MCP Setup** | ⚠️ Manual config | ⚠️ Manual config | **✅ Auto-injects Claude & Cursor JSON** |
+| **Vendor Lock-in & Pricing** | Monthly SaaS Subscription | Metered API Pricing | **100% Free & Open Source (MIT / CC0)** |
 
 ---
 
-## OpenClaw Integration
+## 🕉️ Mythology & Philosophy
 
-```toml
-[hooks]
-session_start = "openyantra.openclaw.hooks:session_start_hook"
-pre_compact   = "openyantra.openclaw.hooks:pre_compact_hook"
-post_compact  = "openyantra.openclaw.hooks:post_compact_hook"
-session_end   = "openyantra.openclaw.hooks:session_end_hook"
+Named in honour of **Chitragupta** (चित्रगुप्त) -- the Hindu God of Data and divine scribe who maintains the complete ledger of every deed without prejudice or omission.
 
-[env]
-OPENYANTRA_FILE = "~/openyantra/chitrapat.ods"
-```
-
-Full guides for OpenClaw · LangChain · AutoGen · Raw Anthropic API -> [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
-
----
-
-## How It Compares
-
-| Feature | Flat Text | Vector/RAG | MemGPT | Mem0 | Zep | OpenAI Memory | **OpenYantra** |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Human-readable | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| User can edit | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Semantic search | ❌ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ |
-| Compaction-safe | ❌ | ❌ | ✅ | ⚠️ | ✅ | ✅ | ✅ |
-| Multi-agent safe | ❌ | ⚠️ | ❌ | ⚠️ | ✅ | ✅ | ✅ |
-| Immutable audit trail | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ✅ |
-| Injection protection | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Open format (ISO) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Zero infrastructure | ✅ | ❌ | ❌ | ⚠️ | ❌ | ✅ | ✅ |
-| Browser dashboard | ❌ | ❌ | ❌ | ⚠️ | ✅ | ✅ | ✅ |
-| CLI installer | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Mobile capture | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Daily briefing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Copy context for web AI | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Schema migration | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| SQLite WAL backend | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Open protocol (CC0) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-
----
-
-## Version History
-
-| Version | Key additions |
-|---|---|
-| v1.0 | Core protocol -- Chitragupta, Agrasandhanī, Anishtha, Sanchitta, 12-sheet schema |
-| v2.0 | VidyaKosha semantic index, BM25 + TF-IDF hybrid, Pratibimba snapshots |
-| v2.1 | Inbox, Importance column, TTL loops, admission rules, belief diffing, browser dashboard, installer |
-| v2.2 | Complete repo -- all docs, openclaw/, examples/, references/, DEPLOYMENT.md |
-| v2.3 | Self-contained installer (auto Python + LibreOffice + all deps), Telegram bot, daily digest |
-| v2.4 | Raksha security -- injection scanner, agent trust tiers 0-5, Mudra verification, quarantine |
-| v2.5 | Today tab, Timeline, Conflict Resolver, floating capture button, mobile CSS |
-| v2.6 | 12-question Bootstrap interview, first-launch onboarding tour, brand assets rebuilt |
-| v2.7 | Importance-weighted retrieval (relevance x importance x recency), `yantra stats` |
-| v2.8 | Incremental VidyaKosha sync, admission refinement |
-| v2.9 | Agrasandhanī integrity check, session log archival, Stats tab |
-| v2.12 | Morning Briefing, Daily Insight card, streak counter, iOS Shortcut, email-to-inbox, `yantra migrate` |
-| v2.13.0 | Token alignment, em dash cleanup, brand asset suite, visual-guide.html, brand-manual.html |
-| v4.0.0 | SQLite WAL backend (2ms writes), SyncEngine, atomic ODS export, write idempotency, portalocker, `yantra sync`, `yantra corrections`, `yantra morning`, `yantra context` |
-| **v4.1.0** | **Dense embeddings (sentence-transformers), date range filter, Google/Apple passkey support** |
-| **v5.0.0** | **Sutradhar Graph Layer (SQLite edges + recursive CTE traversal), Sutra Context Pruning Engine, Setu Sync Durability, dashboard SQLite migration, graph_traverse MCP tool** |
-
----
-
-## Global Stress-Test -- 8 AI Models, 3 Continents, 5 Rounds
-
-The architecture was independently reviewed five times. The v4.0 release is based on Round 5 findings (7 models: ChatGPT, Qwen, Kimi, Mistral, DeepSeek, Grok, GLM5).
-
-**7/7 consensus findings that drove v4.0:**
-- SQLite WAL as operational backend (ODS as export)
-- Write idempotency via request_id dedup
-- portalocker for concurrent read safety
-- Atomic ODS export: write to .tmp, verify, os.replace()
-- Sort Catastrophe warning for LibreOffice users
-
-**The only unanimous verdict across all 5 rounds and all 8 models:**
-The Chitragupta single-writer pattern must never change.
-
-**Named unanimously in all 5 rounds:**
-Anishtha (Open Loops) is the strongest and most novel feature.
-
-See [WHITEPAPER.md](WHITEPAPER.md) for the complete five-round synthesis.
-
----
-
-## Inspired by Chitragupta
-
-| Sanskrit | Mythology | OpenYantra |
-|---|---|---|
-| Chitragupta | Sole trusted recorder | LedgerAgent -- only writer |
-| Agrasandhanī | Cosmic register | `📒` audit trail |
-| Chitrapat | Life scroll | `chitrapat.ods` |
-| Setu | Bridge | SyncEngine -- SQLite to ODS |
-| Sutradhar | Thread-connector | Graph edges -- bidirectional traversal |
-| Anishtha | Unfinished intent (Zeigarnik) | Open Loops -- compaction safety |
-| Mudra | Divine seal | SHA-256 signature |
-| Dharma-Adesh | Righteous command | User edits always win |
-| Raksha | Divine protection | Security engine |
-| VidyaKosha | Knowledge repository | Semantic search index |
-
-See [MYTHOLOGY.md](MYTHOLOGY.md) · [WHITEPAPER.md](WHITEPAPER.md) · [visual-guide.html](website/visual-guide.html) · [docs.html](website/docs.html)
-
----
-
-## Regional Compliance
-
-| Profile | Region | Laws |
-|---|---|---|
-| OpenYantra-IN 🇮🇳 | India (home) | DPDP Act 2023, IT Act 2000 |
-| OpenYantra-EU 🇪🇺 | Europe | GDPR, EU AI Act, Data Act 2023 |
-| OpenYantra-US 🇺🇸 | United States | CCPA/CPRA, HIPAA, COPPA |
-| OpenYantra-CN 🇨🇳 | China | PIPL, DSL, Cybersecurity Law |
-
-See [PRIVACY.md](PRIVACY.md) for full regional specifications.
-
----
-
-## File Structure
-
-```
-openyantra/
-├── openyantra/                <- Core Python package
-│   ├── core.py                <- Core memory and ODS reading/writing engine
-│   ├── cli.py                 <- Command-line interface parser
-│   ├── yantra_sqlite.py       <- SyncEngine: SQLite WAL + atomic ODS export
-│   ├── yantra_morning.py      <- Proactive morning briefings generator
-│   ├── yantra_context.py      <- Session context assembler
-│   ├── vidyakosha.py          <- Semantic search (VidyaKosha search index)
-│   ├── yantra_ui.py           <- FastAPI-powered local web dashboard
-│   ├── yantra_security.py     <- Raksha security and threat engine
-│   ├── yantra_passkey.py      <- Passkey (WebAuthn) local device verification
-│   ├── yantra_digest.py       <- Proactive daily digest generator
-│   ├── telegram_bot.py        <- Telegram capture adapter
-│   ├── ios_shortcut.py        <- iOS Shortcut HTTP capture receiver
-│   ├── yantra_mail.py         <- Local SMTP capture server
-│   ├── yantra_migrate.py      <- Schema migration tool
-│   ├── yantra_sutra.py        <- Sutra Context Pruning Engine
-│   ├── cognitive_db.py        <- Local SQLite memory cache layer
-│   ├── cognitive_mcp.py       <- Model Context Protocol server implementation
-│   └── chitrapat_template.ods <- Blank life scroll template
-├── website/                   <- Public website & visual documents
-│   ├── index.html             <- Project homepage
-│   ├── docs.html              <- Workflows, installation, & MCP server docs
-│   ├── visual-guide.html      <- Interactive visual guidelines & architecture
-│   └── assets/                <- Site logos, SVG marks, and favicons
-├── install.sh                 <- macOS/Linux self-contained installer script
-├── install.ps1                <- Windows PowerShell installer script
-├── WHITEPAPER.md              <- Architecture and research whitepaper
-├── PROTOCOL.md                <- Standard protocol specification (CC0)
-├── SKILL.md                   <- AI tool/skill integration manifest
-├── MYTHOLOGY.md               <- Sanskrit concepts & Chitragupta origin guide
-├── PRIVACY.md                 <- Regional cyber compliance profiles (IN, EU, US, CN)
-├── CHANGELOG.md               <- Complete version history
-├── LICENSE                    <- License (MIT / CC0)
-├── screenshots/               <- Dashboard UI screenshots
-├── docs/                      <- Deployment & troubleshooting documentation
-├── openclaw/                  <- OpenClaw plugin integration
-├── examples/                  <- Quickstart examples & adapter configs
-├── tests/                     <- Unit and integration test suites
-└── references/                <- Schema vocabulary definitions
-```
-
----
-
-## Contributing
-
-Framework adapters · Mobile capture improvements · Benchmarks (LOCOMO / DMR) · Language ports · v3.1 dense embeddings
-
-Open an issue before a PR for protocol-level changes.
-
----
-
-## License
-
-Protocol Specification: **CC0 1.0 Universal** (Public Domain)
-Library: **MIT License**
-
----
-
-*Built in Hyderabad, India. Conceived by Revanth Levaka -- filmmaker and open-source builder.*
-*Stress-tested by 8 AI models across 3 continents across 5 rounds.*
-*Named in honour of Chitragupta -- the Hindu God of Data.*
+The architecture mirrors this philosophy precisely:
+- **Single Trusted Recorder:** Only Chitragupta may commit records to the ledger.
+- **Dharma-Adesh:** The user's righteous command always wins over agent assumptions.
+- **Anishtha:** Unfinished intent is preserved across context boundaries.
+- **Mudra:** Every write is permanently sealed with a SHA-256 digital signature.
 
 *The record exists to serve the remembered, not the recorder.*
 
 ---
 
-## Screenshots
+## 📄 License & Community
 
-| Today Tab | CLI Terminal | Web UI |
-|---|---|---|
-| ![Today](website/assets/screenshots/screenshot_today.svg) | ![CLI](website/assets/screenshots/screenshot_cli.svg) | ![Web UI](website/assets/screenshots/screenshot_webui.svg) |
+- **Protocol Specification:** [CC0 1.0 Universal](PROTOCOL.md) (Public Domain)
+- **Software Library:** [MIT License](LICENSE)
+- **Author:** [Revanth Levaka](https://github.com/revanthlevaka)
 
-| Mobile | Architecture | Open Loops |
-|---|---|---|
-| ![Mobile](website/assets/screenshots/screenshot_mobile.svg) | ![Architecture](website/assets/screenshots/screenshot_architecture.svg) | ![Loops](website/assets/screenshots/screenshot_loops.svg) |
+---
+<p align="center">
+  <em>OpenYantra -- Open formats only. Zero lock-in. Sovereign AI memory for everyone.</em>
+</p>

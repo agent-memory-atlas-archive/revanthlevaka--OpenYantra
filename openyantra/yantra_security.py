@@ -194,6 +194,16 @@ class ScanResult:
         }
 
 
+SECRET_PATTERNS = [
+    ("anthropic_api_key", re.compile(r"sk-ant-[a-zA-Z0-9_-]{20,}")),
+    ("openai_api_key", re.compile(r"sk-(?!ant-)[a-zA-Z0-9_-]{20,}")),
+    ("github_token", re.compile(r"(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36}|github_pat_[A-Za-z0-9_]{22,}")),
+    ("aws_access_key", re.compile(r"(?:A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}")),
+    ("private_key", re.compile(r"-----BEGIN (?:[A-Z0-9_-]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9_-]+ )?PRIVATE KEY-----")),
+    ("slack_token", re.compile(r"xox[baprs]-[0-9a-zA-Z]{10,}")),
+    ("stripe_key", re.compile(r"sk_live_[0-9a-zA-Z]{24,}")),
+]
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Raksha -- the security engine
 # ══════════════════════════════════════════════════════════════════════════════
@@ -284,6 +294,51 @@ class Raksha:
         cleaned = cleaned.strip()
 
         return cleaned
+
+    def redact_secrets(self, text: str) -> tuple[str, list[dict]]:
+        """
+        Scan text for API keys, tokens, and credentials.
+        Replaces each with [REDACTED_API_KEY:<provider>...<short_hash>]
+        Returns (cleaned_text, list_of_redactions).
+        """
+        redactions = []
+        cleaned = text
+
+        for label, pattern in SECRET_PATTERNS:
+            def _repl(match):
+                val = match.group(0)
+                h = hashlib.sha256(val.encode("utf-8")).hexdigest()[:8]
+                provider = label.split("_")[0]
+                if label == "private_key":
+                    redacted = f"[REDACTED_PRIVATE_KEY:{h}]"
+                else:
+                    redacted = f"[REDACTED_API_KEY:{provider}:{h}]"
+                redactions.append({
+                    "type": label,
+                    "redacted_as": redacted,
+                    "sha256": h
+                })
+                return redacted
+
+            cleaned = pattern.sub(_repl, cleaned)
+
+        return cleaned, redactions
+
+    def sanitise_fields(self, fields: dict) -> tuple[dict, list[dict]]:
+        """
+        Sanitise all string values in a fields dict, redacting any secrets.
+        Returns (sanitised_fields, all_redactions).
+        """
+        sanitised = {}
+        all_redactions = []
+        for k, v in fields.items():
+            if isinstance(v, str):
+                clean_v, red = self.redact_secrets(v)
+                sanitised[k] = clean_v
+                all_redactions.extend(red)
+            else:
+                sanitised[k] = v
+        return sanitised, all_redactions
 
     def verify_mudra(self, fields: dict, agent: str, sheet: str,
                      operation: str, stored_signature: str) -> bool:

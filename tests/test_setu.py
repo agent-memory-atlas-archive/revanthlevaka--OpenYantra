@@ -188,7 +188,8 @@ def test_ods_header_validation(temp_dir):
     assert import_res["error"] == "ODS header validation failed"
     assert len(import_res["details"]) > 0
 
-def test_1mb_clipboard_guard(temp_dir):
+def test_1mb_clipboard_guard(temp_dir, monkeypatch):
+    monkeypatch.setenv("OPENYANTRA_DIR", str(temp_dir / ".openyantra"))
     ods_path = temp_dir / "chitrapat.ods"
     db_path = temp_dir / "chitrapat.db"
     
@@ -211,7 +212,7 @@ def test_1mb_clipboard_guard(temp_dir):
         markdown_res = run_context(str(ods_path))
         
         # Verify fallback file creation
-        fallback_file = Path("~/.openyantra/active_context.md").expanduser()
+        fallback_file = Path(os.environ.get("OPENYANTRA_DIR", "~/.openyantra")).expanduser() / "active_context.md"
         assert fallback_file.exists()
         assert len(fallback_file.read_text(encoding="utf-8")) > 1024 * 1024
         

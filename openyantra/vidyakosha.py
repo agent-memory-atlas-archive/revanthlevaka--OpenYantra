@@ -113,8 +113,11 @@ class SentenceTransformerEmbedder:
     DIM = 384
 
     def __init__(self):
+        import os
+        os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+        os.environ.setdefault("OMP_NUM_THREADS", "1")
         from sentence_transformers import SentenceTransformer
-        self._model = SentenceTransformer("all-MiniLM-L6-v2")
+        self._model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
 
     def fit(self, texts: list[str]):
         pass  # no fitting needed

@@ -1,201 +1,160 @@
-# OpenYantra Deployment Guide -- v4.1.0
+# OpenYantra Deployment Guide -- v6.1.0
 
-> OpenClaw · LangChain · AutoGen · Raw Anthropic API · SQLite WAL · Passkey Lock
+> OpenYantra Engine · Desktop HUD · MCP Server · Obsidian Vault · LangChain · CrewAI · SQLite WAL · Passkey Lock
 
-## Install
+## 1. Installation
 
 ```bash
-# Mac / Linux
+# macOS / Linux (Self-contained)
 curl -sSL https://raw.githubusercontent.com/revanthlevaka/OpenYantra/main/install.sh | bash
 
-# Windows
+# Windows (PowerShell)
 irm https://raw.githubusercontent.com/revanthlevaka/OpenYantra/main/install.ps1 | iex
 
-# Manual
-pip install odfpy pandas scikit-learn faiss-cpu fastapi uvicorn
-pip install sentence-transformers  # optional
+# Manual pip install
+git clone https://github.com/revanthlevaka/OpenYantra.git
+cd OpenYantra
+pip install -e ".[full]"
 ```
 
-## SQLite WAL SyncEngine & Passkey Lock (v4.0.0+)
+---
 
-Starting in v4.0.0, OpenYantra transitions to a SQLite WAL-backed architecture. SQLite handles fast, 2ms writes at scale, while Chitragupta coordinates atomic, concurrent-safe exports to the LibreOffice-compatible `Chitrapat.ods` spreadsheet asynchronously.
+## 2. Desktop App & Floating HUD (`Cmd+Shift+Y`)
 
-Additionally, v4.1.0 adds **Local Passkey (WebAuthn) Lock** security. You can secure your yantra with biometric lock protection using Apple FaceID/TouchID or Windows Hello.
-
-```python
-# Passkey configuration & authentication
-from openyantra.yantra_passkey import PasskeyAuth
-
-# Register a new local passkey
-PasskeyAuth.register(device_name="My Laptop")
-
-# Authenticate session
-if not PasskeyAuth.authenticate():
-    raise PermissionError("Access Denied: Biometric verification failed")
-```
-
-## Morning Brief and Context Copy (v4.1.0+)
-
-```python
-# Morning brief -- runs automatically on first yantra command of the day
-oy.morning_brief_auto()
-
-# Full brief as string
-brief = oy.morning_brief(format="terminal")   # or "telegram"
-
-# Copy full context to clipboard for pasting into any AI chat
-md = oy.build_context_markdown()
-oy.copy_context()   # builds + copies to clipboard
-```
-
-CLI:
-```bash
-yantra morning    # print morning brief
-yantra context    # build + copy context markdown to clipboard
-```
-
-## Session lifecycle
-
-```
-Startup        → sanchitta replay (crash recovery)
-Session Start  → load_session_context() + take_pratibimba()
-Conversation   → request_write() + search() + inbox()
-Pre-Compaction → flush_open_loop()
-Post-Compaction→ re-inject open loops from file
-Session End    → log_session() + release_pratibimba()
-```
-
-## OpenClaw
-
-```toml
-# openclaw/config.toml
-[hooks]
-session_start = "openyantra.openclaw.hooks:session_start_hook"
-pre_compact   = "openyantra.openclaw.hooks:pre_compact_hook"
-post_compact  = "openyantra.openclaw.hooks:post_compact_hook"
-session_end   = "openyantra.openclaw.hooks:session_end_hook"
-
-[env]
-OPENYANTRA_FILE = "~/openyantra/chitrapat.ods"
-```
-
-```python
-from openyantra import OpenYantra
-
-oy = OpenYantra("~/openyantra/chitrapat.ods", agent_name="OpenClaw")
-oy.take_pratibimba()
-system_prompt = oy.build_system_prompt_block()
-
-# Writes
-oy.add_project("My Film", status="Active", priority="High", importance=9)
-oy.inbox("Quick thought captured mid-session")
-oy.flush_open_loop("Unresolved decision", "Context here", "High", ttl_days=30)
-
-# Semantic search
-results = oy.search("screenplay structure")
-loops   = oy.search_open_loops("unresolved film choices")
-
-# Session end
-oy.log_session(topics=["film"], decisions=["Use 3-act"])
-oy.release_pratibimba()
-```
-
-## LangChain
-
-```python
-from openyantra.examples.langchain_adapter import OpenYantraChatMemory
-from langchain.agents import initialize_agent
-
-memory = OpenYantraChatMemory(path="~/openyantra/chitrapat.ods", agent_name="LangChain")
-agent  = initialize_agent(tools=[], llm=llm, memory=memory)
-```
-
-## AutoGen
-
-```python
-import autogen
-from openyantra import OpenYantra
-
-oy      = OpenYantra("~/openyantra/chitrapat.ods", agent_name="AutoGen")
-oy_ctx  = oy.build_system_prompt_block()
-oy.take_pratibimba()
-
-assistant = autogen.AssistantAgent(
-    name="assistant",
-    system_message=f"{oy_ctx}\n\nYou are a helpful assistant.",
-    llm_config={"config_list": [{"model": "claude-sonnet-4-20250514"}]}
-)
-# ... run conversation ...
-oy.log_session(topics=["session"]); oy.release_pratibimba()
-```
-
-## Raw Anthropic API
-
-```python
-import anthropic
-from openyantra import OpenYantra
-
-oy     = OpenYantra("~/openyantra/chitrapat.ods", agent_name="Claude")
-client = anthropic.Anthropic()
-
-oy.take_pratibimba()
-context  = oy.build_system_prompt_block()
-relevant = oy.search("topic of conversation", top_k=3)
-extra    = "\n".join(f"[Memory] {r['sheet']}: {r['primary_value']}" for r in relevant)
-
-response = client.messages.create(
-    model="claude-sonnet-4-20250514", max_tokens=2048,
-    system=f"{context}\n\nRelevant memory:\n{extra}",
-    messages=[{"role": "user", "content": "Help me"}]
-)
-oy.log_session(topics=["session"]); oy.release_pratibimba()
-```
-
-## Browser Dashboard
+Launch the native desktop window or Raycast/Spotlight-style floating palette:
 
 ```bash
-yantra ui          # opens http://localhost:7331
-yantra ui 8080     # custom port
+# Launch floating HUD palette
+yantra desktop
+# or alias
+yantra hud
+
+# Launch full native window
+yantra desktop --mode dashboard
 ```
 
-Tabs: Dashboard · Inbox · Projects · Open Loops · Tasks · Corrections · Ledger · Health
+- **Global Hotkey:** `Cmd+Shift+Y` (macOS) or `Ctrl+Shift+Y` (Windows/Linux) slides the HUD open over whichever IDE (Cursor, VS Code) or terminal you have active.
+- **Shortcuts:** `Enter` to save capture or copy selected search item, `Tab` to switch views, `Escape` to close.
 
-## Oracle and Export (v4.1.0)
+---
 
-```python
-# Oracle -- cross-reference engine, read-only
-insights = oy.oracle(max_insights=8)
-# Returns list of dicts: type, title, detail, action
-for ins in insights:
-    print(f"[{ins['type']}] {ins['title']}")
-    print(f"  {ins['detail']}")
-    print(f"  Action: {ins['action']}")
+## 3. 1-Click MCP Setup for Claude & Cursor
 
-# Plain text for terminal or morning brief
-print(oy.oracle_text())
+Automatically configure Claude Desktop and Cursor without editing JSON files manually:
 
-# Export -- markdown or JSON
-md = oy.export()                                  # all sheets
-md = oy.export(sheet="loops")                     # just open loops
-md = oy.export(fmt="json", sheet="projects")      # JSON
-oy.export(since="2026-01-01", output_path="~/ctx.md")
-```
-
-CLI:
 ```bash
-yantra oracle
-yantra export
-yantra export --sheet loops
-yantra export --format json
-yantra export --since 2026-01-01 --output ~/ctx.md
+# Auto-detect and configure all installed clients
+yantra mcp setup
+
+# Or target specific client
+yantra mcp setup --client claude
+yantra mcp setup --client cursor
 ```
 
-## Troubleshooting
+After running, restart Claude Desktop or Cursor to immediately access OpenYantra memory tools (`yantra_search`, `yantra_get_sheet`, `yantra_request_write`, etc.).
 
-| Issue | Fix |
-|---|---|
-| "Chitrapat not found" | `yantra bootstrap` or `oy.bootstrap()` |
-| "Sanchitta replayed" | Normal -- crashed writes auto-recovered |
-| "VidyaKosha not available" | Ensure `vidyakosha.py` in same directory |
-| Search returns empty | `oy._vidyakosha.sync(oy.path)` to rebuild index |
-| Slow writes at scale | Resolved in v4.0.0+; SQLite WAL SyncEngine handles writes in 2ms, with ODS export running asynchronously off the hot path |
+---
+
+## 4. Autonomous Sleep & Memory Consolidation (Nidra)
+
+Run the cognitive consolidation daemon locally:
+
+```bash
+# Live consolidation
+yantra dream
+
+# Or simulation pass
+yantra dream --dry-run
+```
+
+- Connects to local Ollama (`http://localhost:11434`) if active (e.g., `llama3`, `mistral`, `phi3`).
+- Deterministic heuristic fallback if Ollama is not running.
+- Clusters episodic logs, resolves completed loops, and promotes user preferences to `Beliefs & Principles`.
+
+---
+
+## 5. Bi-Directional Obsidian Vault Sync
+
+Keep your Obsidian notes and OpenYantra ledger in sync:
+
+```bash
+# Bi-directional sync (imports checkbox changes, re-exports notes)
+yantra vault sync ~/my_vault
+
+# Export only
+yantra vault export ~/my_vault
+
+# Import only (detects checked - [x] tasks and resolves them in OpenYantra)
+yantra vault import ~/my_vault
+```
+
+---
+
+## 6. Git Commit Auto-Ingest Hook
+
+Automatically index git commits across your projects:
+
+```bash
+# Install post-commit hook in current repository
+yantra hook install
+
+# Ingest last commit manually
+yantra hook run
+```
+
+---
+
+## 7. Cyberpunk Terminal TUI
+
+For SSH sessions and terminal purists:
+
+```bash
+yantra tui
+```
+
+Interactive keyboard shortcuts: `[i]` Quick Capture, `[d]` Run Dream, `[h]` Launch HUD, `[q]` Quit.
+
+---
+
+## 8. Framework Adapters (LangChain & CrewAI)
+
+### LangChain Integration:
+```python
+from openyantra import OpenYantra
+from openyantra.adapters.langchain import OpenYantraChatMessageHistory, OpenYantraRetriever
+
+oy = OpenYantra("~/openyantra/chitrapat.ods")
+
+# Chat History
+history = OpenYantraChatMessageHistory(oy, session_id="session_42")
+history.add_user_message("Let's refactor the database schema")
+history.add_ai_message("I suggest enabling WAL mode")
+history.flush_to_session_log()
+
+# Semantic Retriever
+retriever = OpenYantraRetriever(oy, top_k=5)
+docs = retriever.invoke("What are my core architectural beliefs?")
+```
+
+### CrewAI Multi-Agent Memory:
+```python
+from openyantra import OpenYantra
+from openyantra.adapters.crewai import OpenYantraCrewMemory
+
+oy = OpenYantra("~/openyantra/chitrapat.ods")
+memory = OpenYantraCrewMemory(oy, agent_name="ResearchAnalyst")
+
+# Agent saves discovery directly into OpenYantra
+memory.save("QuantumSync reached 99.9% fault tolerance", metadata={"type": "project", "domain": "Core"})
+```
+
+---
+
+## 9. Troubleshooting
+
+| Issue | Solution |
+| :--- | :--- |
+| **"Chitrapat not found"** | Run `yantra bootstrap` to create your initial memory vault. |
+| **"pywebview not found"** | Run `pip install pywebview` for native borderless desktop windows. |
+| **"Port 7331 in use"** | Specify an alternative port: `yantra ui --port 7335` or `yantra desktop --port 7335`. |
+| **"MCP server not responding"** | Run `yantra doctor` to verify environment and test with `yantra mcp serve`. |

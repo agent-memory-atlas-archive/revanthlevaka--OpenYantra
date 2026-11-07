@@ -1,20 +1,21 @@
 ---
 name: openyantra
-version: 4.1.0
+version: 6.1.0
 description: >
-  Implements OpenYantra v4.1.0 -- The Sacred Memory Machine -- persistent,
+  Implements OpenYantra v6.1.0 -- The Sacred Memory Machine -- persistent,
   structured, human-readable memory for personal agentic AI, inspired by
   Chitragupta (the Hindu God of Data). Uses open-standard .ods files,
   SQLite WAL operational backend, Chitragupta/LedgerAgent single-writer,
   VidyaKosha hybrid semantic search, Inbox quick capture, Morning Briefing,
-  Copy Context, browser dashboard, and one-command CLI installer.
+  Copy Context, Desktop HUD (Cmd+Shift+Y), 1-Click MCP auto-setup,
+  Nidra sleep consolidation, and bi-directional Obsidian vault sync.
   Use whenever the user wants an AI agent to remember things across sessions,
   building agentic tools needing persistent context, setting up memory for
-  OpenClaw / LangChain / AutoGen, or saying "the AI keeps forgetting",
+  OpenClaw / LangChain / AutoGen / CrewAI, or saying "the AI keeps forgetting",
   "I have to repeat myself", "how do I give my agent memory".
 ---
 
-# OpenYantra v4.1.0 -- The Sacred Memory Machine
+# OpenYantra v6.1.0 -- The Sacred Memory Machine
 
 > *Inspired by Chitragupta, the Hindu God of Data*
 
@@ -229,14 +230,21 @@ oy.release_pratibimba()              # release
 ## Key Files
 
 ```
-openyantra/core.py         <- Core library (Chitragupta pattern)
-openyantra/yantra_sqlite.py      <- SyncEngine (v4.1 SQLite WAL + atomic ODS export)
+openyantra/core.py               <- Core memory library (Chitragupta pattern)
+openyantra/desktop.py            <- Native Desktop App & HUD Launcher (v1.0.0)
+openyantra/yantra_nidra.py       <- Autonomous Sleep & Consolidation Engine (Nidra)
+openyantra/yantra_vault.py       <- Bi-directional Obsidian Markdown Vault Sync
+openyantra/mcp_setup.py          <- 1-Click MCP Auto-Configurator
+openyantra/adapters/             <- LangChain & CrewAI Framework Adapters
+openyantra/yantra_git.py         <- Git Post-Commit Auto-Ingest Hook
+openyantra/yantra_tui.py         <- Cyberpunk Terminal TUI Dashboard
+openyantra/yantra_sqlite.py      <- SyncEngine (SQLite WAL + atomic ODS export)
 openyantra/yantra_morning.py     <- Morning Briefing
 openyantra/yantra_context.py     <- Copy Context (paste into any AI)
-openyantra/vidyakosha.py         <- Semantic index
-openyantra/yantra_ui.py          <- Browser dashboard
-openyantra/yantra_security.py    <- Raksha engine
-install.sh            <- One-command Mac/Linux installer
-website/visual-guide.html     <- Interactive architecture guide
-website/docs.html             <- Workflows, Installation, & MCP Docs
+openyantra/vidyakosha.py         <- Semantic vector search
+openyantra/yantra_ui.py          <- Web dashboard & FastAPI server
+openyantra/yantra_security.py    <- Raksha threat & secret redactor engine
+UI/v4/hud.html                   <- Floating Raycast/Spotlight-style HUD palette
+install.sh                       <- One-command Mac/Linux installer
+install.ps1                      <- One-command Windows installer
 ```

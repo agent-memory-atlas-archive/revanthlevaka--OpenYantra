@@ -254,23 +254,24 @@ Key quotes from Round 4:
 
 ## 5. Comparison with Related Systems
 
-| Feature | Flat Text | Vector/RAG | MemGPT | Mem0 | Zep | OpenAI Memory | **OpenYantra** |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Human-readable | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| User can edit | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Semantic search | ❌ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ |
-| Compaction-safe | ❌ | ❌ | ✅ | ⚠️ | ✅ | ✅ | ✅ |
-| Multi-agent safe | ❌ | ⚠️ | ❌ | ⚠️ | ✅ | ✅ | ✅ |
-| Immutable audit trail | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ✅ |
-| Injection protection | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Open format (ISO) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Zero infrastructure | ✅ | ❌ | ❌ | ⚠️ | ❌ | ✅ | ✅ |
-| Browser dashboard | ❌ | ❌ | ❌ | ⚠️ | ✅ | ✅ | ✅ |
-| Mobile capture | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Daily briefing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Copy context for web AI | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| GDPR-native | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Open protocol (CC0) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Feature | Flat Text | Vector/RAG | MemGPT | Mem0 | Zep | Living Brain | OpenAI Memory | **OpenYantra** |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Human-readable | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| User can edit | ✅ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ✅ |
+| Semantic search | ❌ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ⚠️ | ✅ |
+| Compaction-safe | ❌ | ❌ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ |
+| Multi-agent safe | ❌ | ⚠️ | ❌ | ⚠️ | ✅ | ✅ | ✅ | ✅ |
+| Immutable audit trail | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
+| Injection protection | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ✅ |
+| Open format (ISO) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| 100% Local / Offline | ✅ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Zero infrastructure | ✅ | ❌ | ❌ | ⚠️ | ❌ | ⚠️ | ✅ | ✅ |
+| Browser / Desktop HUD | ❌ | ❌ | ❌ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ |
+| Mobile capture | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ✅ |
+| Daily briefing | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Copy context for web AI | ❌ | ❌ | ❌ | ❌ | ❌ | ⚠️ | ❌ | ✅ |
+| GDPR-native | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Open protocol (CC0) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
 

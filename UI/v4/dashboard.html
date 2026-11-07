@@ -315,9 +315,11 @@ tr:hover td{background:var(--surface2);}
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
     </button>
     OpenYantra
-    <span class="hdr-badge">v4.1.0</span>
+    <span class="hdr-badge">v6.2.0</span>
   </div>
   <div class="hdr-r">
+    <button id="nidraBtn" class="btn" style="font-size:9px; padding:3px 7px; border-color:var(--border2); align-items:center; gap:3px;" onclick="triggerNidra()" title="Run Nidra Sleep & Memory Consolidation">🌙 Dream</button>
+    <button id="vaultBtn" class="btn" style="font-size:9px; padding:3px 7px; border-color:var(--border2); align-items:center; gap:3px;" onclick="triggerVaultSync()" title="Sync with Obsidian Vault">📓 Sync Vault</button>
     <button id="lockBtn" class="btn" style="display:none; font-size:9px; padding:3px 6px; border-color:var(--border2); margin-right:8px; align-items:center; gap:3px;" onclick="lockYantraManual()">🔒 Lock</button>
     <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--green)"><span class="status-dot"></span>Chitragupta active</span>
     <div class="theme-row" id="tr">
@@ -606,6 +608,47 @@ async function lockYantraManual() {
     toast('Logout failed', false);
   }
 }
+
+async function triggerNidra() {
+  const btn = document.getElementById('nidraBtn');
+  if (btn) btn.textContent = '🌙 Dreaming...';
+  toast('Starting Nidra sleep consolidation pass...');
+  try {
+    const res = await api('/api/nidra/consolidate', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ dry_run: false, provider: 'auto' }) });
+    if (res && res.sessions_clustered !== undefined) {
+      toast(`Nidra Complete: Clustered ${res.sessions_clustered} sessions, resolved ${res.loops_resolved ? res.loops_resolved.length : 0} loops!`);
+      if (cur === 'today') await loadToday();
+    } else {
+      toast('Consolidation finished');
+    }
+  } catch(e) {
+    toast('Error during consolidation', false);
+  } finally {
+    if (btn) btn.textContent = '🌙 Dream';
+  }
+}
+
+async function triggerVaultSync() {
+  const btn = document.getElementById('vaultBtn');
+  if (btn) btn.textContent = '📓 Syncing...';
+  toast('Syncing Obsidian Vault...');
+  try {
+    const res = await api('/api/vault/sync', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({}) });
+    if (res && res.status === 'success') {
+      const imp = res.imported || {};
+      const exp = res.exported || {};
+      toast(`Vault Synced: ${imp.loops_resolved ? imp.loops_resolved.length : 0} loops resolved, ${exp.files_exported || 0} files updated!`);
+      if (cur === 'today') await loadToday();
+      if (cur === 'loops') await loadLoops();
+    } else {
+      toast('Vault sync finished');
+    }
+  } catch(e) {
+    toast('Error syncing vault', false);
+  } finally {
+    if (btn) btn.textContent = '📓 Sync Vault';
+  }
+}
 const ptag = s=>{if(!s)return'';const m={'Active':'b-ok','Pending':'b-md','High':'b-hi','Critical':'b-hi','Medium':'b-md','Low':'b-lo','Done':'b-lo','written':'b-ok','confirmed':'b-hi','suspicious':'b-md','clean':'b-ok'};return`<span class="badge ${m[s]||''}">${s}</span>`;};
 const tbl = (rows,cols)=>{
   if(!rows||!rows.length)return'<div class="empty">No data yet.</div>';
@@ -643,11 +686,11 @@ async function loadToday(){
     api('/api/sheet/tasks'),api('/api/sheet/inbox'),api('/api/oracle')
   ]);
   const cards=[
-    {n:h.open_loops||0,k:'Open Loops',c:(h.open_loops||0)>10?'warn':''},
-    {n:h.inbox_pending||0,k:'Inbox',c:(h.inbox_pending||0)>0?'warn':''},
-    {n:h.corrections_pending||0,k:'Corrections',c:(h.corrections_pending||0)>0?'warn':''},
-    {n:h.stale_projects||0,k:'Stale Projects',c:(h.stale_projects||0)>0?'alert':''},
-  ].map(c=>`<div class="card ${c.c}" onclick="goTo('${c.k.toLowerCase().replace(' ','')}')"><div class="cn" style="color:var(--amber)">${c.n}</div><div class="ck">${c.k}</div></div>`).join('');
+    {n:h.open_loops||0,k:'Open Loops',t:'loops',c:(h.open_loops||0)>10?'warn':''},
+    {n:h.inbox_pending||0,k:'Inbox',t:'inbox',c:(h.inbox_pending||0)>0?'warn':''},
+    {n:h.corrections_pending||0,k:'Corrections',t:'review',c:(h.corrections_pending||0)>0?'warn':''},
+    {n:h.stale_projects||0,k:'Stale Projects',t:'projects',c:(h.stale_projects||0)>0?'alert':''},
+  ].map(c=>`<div class="card ${c.c}" onclick="goTo('${c.t}')"><div class="cn" style="color:var(--amber)">${c.n}</div><div class="ck">${c.k}</div></div>`).join('');
 
   // Copy context button
   const ctxBtn=`<div class="ctx-btn"><button class="btn-p" onclick="copyCtx()">📋 Copy Context</button><span class="ctx-hint">Paste into Claude.ai, ChatGPT, or any AI chat</span></div>`;
@@ -726,7 +769,7 @@ async function loadInbox(){
   const d=await api('/api/sheet/inbox');
   const rows=(d.rows||[]).filter(r=>r['Routed?']==='No');
   let html=`<div class="sh"><span>Inbox -- Quick Capture</span></div>`;
-  html+=`<div class="ibf"><input id="ii" placeholder="Capture a thought..."/><button class="btn-p" onclick="saveInbox()">Save</button></div>`;
+  html+=`<div class="ibf"><input id="ii" placeholder="Capture a thought..." onkeydown="if(event.key==='Enter')saveInbox()"/><button class="btn-p" onclick="saveInbox()">Save</button></div>`;
   html+=tbl(rows,['Content','Captured','Importance','Source']);
   if(rows.length)html+=`<br><button class="btn btn-ok" onclick="routeAll()">Route All (${rows.length} items)</button>`;
   document.getElementById('inbox').innerHTML=html;
@@ -819,9 +862,22 @@ async function loadHealth(){
 
 /* Actions */
 function goTo(name){
+  const tabAliases = {
+    'openloops': 'loops',
+    'open_loops': 'loops',
+    'corrections': 'review',
+    'staleprojects': 'projects',
+    'stale_projects': 'projects',
+    'graph': 'cognitive_graph',
+    'memories': 'cognitive_memories',
+    'hierarchy': 'cognitive_hierarchy',
+    'settings': 'config_settings',
+    'compile': 'context_compile',
+  };
+  const target = tabAliases[name] || name;
   const tabs=['today','inbox','loops','projects','oracle','review','timeline','security','ledger','health','cognitive_memories','cognitive_hierarchy','cognitive_graph','context_compile','config_settings'];
-  const idx=tabs.indexOf(name);
-  if(idx>=0)go(name,document.querySelectorAll('.ntab')[idx]);
+  const idx=tabs.indexOf(target);
+  if(idx>=0)go(target,document.querySelectorAll('.ntab')[idx]);
 }
 
 async function saveInbox(){
@@ -2006,8 +2062,8 @@ async function loadCognitiveGraph() {
   graphCtx = graphCanvas.getContext('2d');
   
   const rect = graphCanvas.parentElement.getBoundingClientRect();
-  graphCanvas.width = rect.width;
-  graphCanvas.height = rect.height;
+  graphCanvas.width = rect.width || 800;
+  graphCanvas.height = rect.height || 550;
   
   // Fetch all data sources in parallel
   const [memoriesRes, hierarchyRes, sutradharRes] = await Promise.all([

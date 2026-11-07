@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 100" width="540" height="100">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="540" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1c6fff"/>
+      <stop offset="32%" stop-color="#5535e0"/>
+      <stop offset="66%" stop-color="#e84520"/>
+      <stop offset="100%" stop-color="#f5a000"/>
+    </linearGradient>
+    <linearGradient id="mG" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1c6fff"/>
+      <stop offset="33%" stop-color="#5535e0"/>
+      <stop offset="66%" stop-color="#e84520"/>
+      <stop offset="100%" stop-color="#f5a000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sacred Geometric Logo Mark -->
+  <g transform="translate(48, 50) scale(0.7)">
+    <circle cx="0" cy="0" r="47" stroke="url(#mG)" stroke-width="2" fill="none"/>
+    <circle cx="0" cy="0" r="33" stroke="url(#mG)" stroke-width="1.2" fill="none" opacity="0.6"/>
+    <circle cx="0" cy="0" r="18" stroke="url(#mG)" stroke-width="0.9" fill="none" opacity="0.4"/>
+    <circle cx="0" cy="0" r="4.5" fill="url(#mG)"/>
+    <line x1="0" y1="-47" x2="0" y2="47" stroke="url(#mG)" stroke-width="0.8" opacity="0.25"/>
+    <line x1="-47" y1="0" x2="47" y2="0" stroke="url(#mG)" stroke-width="0.8" opacity="0.25"/>
+    <circle cx="0" cy="-47" r="3.5" fill="#1c6fff"/>
+    <circle cx="47" cy="0" r="3.5" fill="#5535e0"/>
+    <circle cx="0" cy="47" r="3.5" fill="#e84520"/>
+    <circle cx="-47" cy="0" r="3.5" fill="#f5a000"/>
+    <path d="M0 -47 Q16 -24 0 0 Q-16 -24 0 -47" stroke="url(#mG)" stroke-width="1.1" fill="none" opacity="0.5"/>
+    <path d="M47 0 Q24 16 0 0 Q24 -16 47 0" stroke="url(#mG)" stroke-width="1.1" fill="none" opacity="0.5"/>
+    <path d="M0 47 Q-16 24 0 0 Q16 24 0 47" stroke="url(#mG)" stroke-width="1.1" fill="none" opacity="0.5"/>
+    <path d="M-47 0 Q-24 -16 0 0 Q-24 16 -47 0" stroke="url(#mG)" stroke-width="1.1" fill="none" opacity="0.5"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="100" y="62" font-family="'IBM Plex Mono', 'JetBrains Mono', monospace" font-size="38" font-weight="300" letter-spacing="-0.5" fill="#e8e5de">Open</text>
+  <text x="206" y="62" font-family="'IBM Plex Mono', 'JetBrains Mono', monospace" font-size="38" font-weight="700" letter-spacing="-0.5" fill="url(#grad)">Yantra</text>
+
+  <!-- Subtitle Tagline -->
+  <text x="375" y="58" font-family="'IBM Plex Mono', 'JetBrains Mono', monospace" font-size="10" font-weight="400" letter-spacing="2.5" fill="#f5a000">v6.2</text>
+</svg>

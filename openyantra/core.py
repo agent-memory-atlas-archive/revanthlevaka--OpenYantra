@@ -27,7 +27,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-__version__ = "5.0.0"
+__version__ = "6.2.0"
 
 
 try:
@@ -37,23 +37,34 @@ except ImportError:
 
 # VidyaKosha -- graceful fallback
 try:
-    from vidyakosha import VidyaKosha as _VK, get_snapshot_mode as _get_snap_mode
+    from openyantra.vidyakosha import VidyaKosha as _VK, get_snapshot_mode as _get_snap_mode
     _VIDYAKOSHA_AVAILABLE = True
 except ImportError:
-    _VIDYAKOSHA_AVAILABLE = False
-    _VK = None
-    _get_snap_mode = None
+    try:
+        from vidyakosha import VidyaKosha as _VK, get_snapshot_mode as _get_snap_mode
+        _VIDYAKOSHA_AVAILABLE = True
+    except ImportError:
+        _VIDYAKOSHA_AVAILABLE = False
+        _VK = None
+        _get_snap_mode = None
 
 # Raksha security engine -- graceful fallback
 try:
-    from yantra_security import (
+    from openyantra.yantra_security import (
         Raksha, ScanResult, ThreatLevel, TrustTier,
         get_raksha, run_security_audit
     )
     _RAKSHA_AVAILABLE = True
 except ImportError:
-    _RAKSHA_AVAILABLE = False
-    Raksha = None
+    try:
+        from yantra_security import (
+            Raksha, ScanResult, ThreatLevel, TrustTier,
+            get_raksha, run_security_audit
+        )
+        _RAKSHA_AVAILABLE = True
+    except ImportError:
+        _RAKSHA_AVAILABLE = False
+        Raksha = None
 
 # ── Controlled vocabulary ──────────────────────────────────────────────────────
 
@@ -451,7 +462,7 @@ class OpenYantra:
         oy.health_check()        -- system status + stats
     """
 
-    VERSION = "5.0.0"
+    VERSION = "6.2.0"
 
     def __init__(self, path: str | Path, agent_name: str = "Agent",
                  dead_switch_minutes: int = 30):
@@ -524,6 +535,9 @@ class OpenYantra:
         """
         # Raksha scan -- check for injection before commit
         if self._raksha is not None:
+            clean_fields, redactions = self._raksha.sanitise_fields(req.fields)
+            if redactions:
+                req.fields = clean_fields
             scan = self._raksha.scan_write(
                 req.fields, req.requesting_agent, req.sheet)
             if scan.should_block:
@@ -886,6 +900,52 @@ class OpenYantra:
                         r[k] = None
             return records
         except Exception: return []
+
+    def get_sheet(self, sheet_name: str) -> list[dict]:
+        """Read rows from a sheet by name or alias."""
+        sheet_map = {
+            "index": SHEET_INDEX,
+            "identity": SHEET_IDENTITY,
+            "goals": SHEET_GOALS,
+            "projects": SHEET_PROJECTS,
+            "people": SHEET_PEOPLE,
+            "preferences": SHEET_PREFERENCES,
+            "beliefs": SHEET_BELIEFS,
+            "tasks": SHEET_TASKS,
+            "open_loops": SHEET_OPEN_LOOPS,
+            "open loops": SHEET_OPEN_LOOPS,
+            "loops": SHEET_OPEN_LOOPS,
+            "session_log": SHEET_SESSION_LOG,
+            "session log": SHEET_SESSION_LOG,
+            "agent_config": SHEET_AGENT_CONFIG,
+            "ledger": SHEET_LEDGER,
+            "inbox": SHEET_INBOX,
+            "corrections": SHEET_CORRECTIONS,
+            "quarantine": SHEET_QUARANTINE,
+            "security_log": SHEET_SECURITY_LOG,
+        }
+        key = sheet_name.lower().replace(" ", "_")
+        actual = sheet_map.get(key, sheet_name)
+        if actual not in ALL_SHEETS and actual not in [SHEET_QUARANTINE, SHEET_SECURITY_LOG]:
+            for s in ALL_SHEETS:
+                if sheet_name.lower() in s.lower():
+                    actual = s
+                    break
+        return self._read_sheet(actual)
+
+    def get_table(self, sheet_name: str) -> list[dict]:
+        """Alias for get_sheet."""
+        return self.get_sheet(sheet_name)
+
+    def sync_from_ods(self) -> dict:
+        """Import ODS edits back into SQLite WAL database."""
+        if hasattr(self, "db_engine") and self.db_engine:
+            return self.db_engine.import_ods(self.path)
+        return {"status": "no_db_engine"}
+
+    def archive_sessions(self, keep_days: int = 90) -> dict:
+        """Archive old session log entries. Alias for archive_session_log."""
+        return self.archive_session_log(keep_days=keep_days)
 
     def load_session_context(self, agent_name: Optional[str] = None) -> dict:
         agent = agent_name or self.agent_name

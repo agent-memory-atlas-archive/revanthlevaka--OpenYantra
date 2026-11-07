@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════
-#  OpenYantra v2.12 Installer -- Mac + Linux
+#  OpenYantra v5.0.0 Installer -- Mac + Linux
 #  The Sacred Memory Machine
 #  Inspired by Chitragupta, the Hindu God of Data
 #
@@ -15,7 +15,7 @@
 
 set -e
 
-VERSION="4.1.0"
+VERSION="6.2.0"
 INSTALL_DIR="$HOME/openyantra"
 VENV_DIR="$INSTALL_DIR/.venv"
 RAW="https://raw.githubusercontent.com/revanthlevaka/OpenYantra/main"
@@ -197,6 +197,8 @@ install_deps() {
     "python-telegram-bot"
     "requests"
     "schedule"
+    "webauthn"
+    "aiosmtpd"
   )
 
   info "Installing: ${CORE_DEPS[*]}"
@@ -230,6 +232,17 @@ download_files() {
     "openyantra/yantra_morning.py"
     "openyantra/yantra_context.py"
     "openyantra/yantra_sqlite.py"
+    "openyantra/yantra_passkey.py"
+    "openyantra/yantra_sutra.py"
+    "openyantra/yantra_nidra.py"
+    "openyantra/yantra_vault.py"
+    "openyantra/mcp_setup.py"
+    "openyantra/adapters/__init__.py"
+    "openyantra/adapters/langchain.py"
+    "openyantra/adapters/crewai.py"
+    "openyantra/yantra_git.py"
+    "openyantra/yantra_tui.py"
+    "openyantra/desktop.py"
     "openyantra/cognitive_mcp.py"
     "openyantra/cognitive_db.py"
     "openyantra/chitrapat_template.ods"
@@ -246,6 +259,7 @@ download_files() {
     "MYTHOLOGY.md"
     "WHITEPAPER.md"
     "UI/v4/dashboard.html"
+    "UI/v4/hud.html"
   )
 
   for file in "${FILES[@]}"; do

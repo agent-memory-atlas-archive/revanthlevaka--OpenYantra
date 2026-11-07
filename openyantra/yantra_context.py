@@ -17,6 +17,7 @@ Usage:
 
 from __future__ import annotations
 
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -267,7 +268,7 @@ def run_context(oy_path: str, output_file: str = None,
         print(f"[yantra context] Saved to {out}")
     else:
         if is_over_limit:
-            fallback_dir = Path("~/.openyantra").expanduser()
+            fallback_dir = Path(os.environ.get("OPENYANTRA_DIR", "~/.openyantra")).expanduser()
             fallback_dir.mkdir(parents=True, exist_ok=True)
             fallback_file = fallback_dir / "active_context.md"
             fallback_file.write_text(markdown, encoding="utf-8")

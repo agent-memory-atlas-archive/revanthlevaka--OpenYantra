@@ -1,4 +1,4 @@
-# OpenYantra Protocol Specification -- v2.12
+# OpenYantra Protocol Specification -- v6.1.0
 
 > *"Your purpose is to stay in the minds of all people and record their thoughts and deeds."*
 > -- Brahma to Chitragupta
@@ -18,6 +18,9 @@
 | v2.4 | Raksha security engine, trust tiers, Quarantine sheet |
 | v2.9 | Morning Briefing, stats analytics, integrity check |
 | v2.12 | Oracle cross-reference engine, export, doc unification |
+| v5.0 | Sutradhar SQLite WAL graph edge storage, Sutra pruning engine, Passkey (WebAuthn) lock |
+| v6.0 | Raksha credential redactor, 1-Click MCP auto-setup, Nidra sleep engine, Obsidian vault sync |
+| v6.1 | OpenYantra Desktop v1.0 HUD (`Cmd+Shift+Y`), Git auto-ingest hook, Cyberpunk Terminal TUI |
 
 ---
 

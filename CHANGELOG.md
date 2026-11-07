@@ -4,6 +4,56 @@ All notable changes documented here. Follows semantic versioning.
 
 ---
 
+## [6.2.0] -- 2026-11-07 ("Design System & Living Brain Comparison")
+
+### Added
+- **Design System Asset Modernization**:
+  - Root `assets/brand/` with sacred geometric vector brandmarks and horizontal logo marks (`logo-horizontal.svg`, `banner-github.svg`).
+  - High-resolution SVG screenshot suites in `assets/screenshots/` showcasing the Today command centre, Web UI, Cyberpunk Terminal TUI, and Open Loops.
+- **Living Brain (`livingbrain.com`) Architectural Comparison**:
+  - Added comprehensive comparison across data sovereignty, human editability, open formats, offline readiness, and desktop HUD ergonomics.
+- **Version Bump**:
+  - Bumped to `v6.2.0` across all libraries, CLI entry points, web UI, installers, and test fixtures.
+
+## [6.1.0] -- 2026-11-07 ("Akasha & Sutra")
+
+### Added
+- **OpenYantra Desktop App v1.0.0** (`openyantra/desktop.py`):
+  - Ultra-lightweight native OS window launcher using `pywebview` (< 15MB binary, zero Electron bloat).
+  - Floating Raycast/Spotlight-style HUD palette (`UI/v4/hud.html`) triggered via `Cmd+Shift+Y` (macOS) / `Ctrl+Shift+Y` (Windows/Linux) directly over Cursor and VS Code.
+  - Quick-capture with auto-routing prefixes (`#project`, `@person`, `!urgent`), live semantic recall search, and 1-click sleep consolidation.
+- **Git Commit Auto-Ingest Hook** (`openyantra/yantra_git.py`):
+  - `yantra hook install [repo]`: Installs a git post-commit hook that automatically indexes commits, branches, messages, and diff file lists into `Session Log`.
+  - `yantra hook run`: Ingests the latest commit on demand.
+- **Cyberpunk Terminal TUI** (`openyantra/yantra_tui.py`):
+  - Interactive terminal dashboard (`yantra tui`) with ANSI styling, live loop tracking, active projects, recent decisions, and hotkeys.
+- **Expanded Test Suite**:
+  - 68 automated unit and integration tests passing with 100% success rate across 15 test files.
+
+## [6.0.0] -- 2026-11-07 ("Sutra & Nidra")
+
+### Added
+- **Raksha Secret & Credential Redactor Guard** (`openyantra/yantra_security.py`):
+  - Automatically intercepts writes to the Chitrapat ledger and redacts Anthropic, OpenAI, AWS, GitHub, Google API keys, Slack tokens, and private keys.
+- **1-Click MCP Auto-Configurator** (`openyantra/mcp_setup.py`):
+  - `yantra mcp setup [--client all|claude|cursor]`: Safely configures Claude Desktop and Cursor JSON configs with automatic backups.
+- **Nidra: Autonomous Sleep & Memory Consolidation Engine** (`openyantra/yantra_nidra.py`):
+  - `yantra dream` / `yantra consolidate`: Clusters episodic session logs, resolves expired and fulfilled open loops, and promotes repeated user preferences into `Beliefs & Principles`.
+  - Integrates with local Ollama (`http://localhost:11434`) with deterministic heuristic fallbacks.
+- **Bi-Directional Obsidian Markdown Vault Sync** (`openyantra/yantra_vault.py`):
+  - `yantra vault export [dir]`: Converts Chitrapat into structured Markdown with YAML frontmatter and wikilinks.
+  - `yantra vault import [dir]`: Ingests user-checked boxes (`- [x]`) and inbox notes from Obsidian back into OpenYantra.
+  - `yantra vault sync [dir]`: Bi-directional synchronization.
+- **Drop-in Framework Adapters** (`openyantra/adapters/`):
+  - `OpenYantraChatMessageHistory` and `OpenYantraRetriever` for LangChain and LangGraph.
+  - `OpenYantraCrewMemory` for multi-agent CrewAI teams.
+- **FastAPI UI & Dashboard v6 Enhancements**:
+  - Resolved Python 3.9 type evaluation crashes.
+  - Added 1-click `🌙 Dream` and `📓 Sync Vault` buttons directly to dashboard header.
+  - Fixed stat card routing (`goTo()`), enter-key submission on inbox input, and canvas fallback geometry.
+
+---
+
 ## [5.0.0] -- 2026-05-22
 
 ### Added

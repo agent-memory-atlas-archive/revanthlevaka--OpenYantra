@@ -11,7 +11,8 @@ v4.1.0:
 
 
 from __future__ import annotations
-import argparse, sys, json
+import argparse, sys, os, json
+from typing import Optional
 from datetime import datetime
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -52,8 +53,18 @@ active_challenges: dict[str, str] = {}
 authenticated_sessions: set[str] = set()
 
 def get_oy() -> OpenYantra:
-    if _oy is None: raise HTTPException(500, "Not initialised")
+    global _oy
+    if _oy is None:
+        file_path = os.environ.get("OPENYANTRA_FILE", "chitrapat.ods")
+        try:
+            _oy = OpenYantra(file_path)
+        except Exception as e:
+            raise HTTPException(500, f"OpenYantra not initialised: {e}")
     return _oy
+
+def set_oy(oy: OpenYantra):
+    global _oy
+    _oy = oy
 
 def get_settings_file() -> Path:
     oy = get_oy()
@@ -121,12 +132,19 @@ def get_cog_store() -> CognitiveMemoryStore:
 
 # Dashboard served from UI/v4/dashboard.html
 _DASHBOARD = Path(__file__).parent.parent / "UI" / "v4" / "dashboard.html"
+_HUD = Path(__file__).parent.parent / "UI" / "v4" / "hud.html"
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
     if _DASHBOARD.exists():
         return FileResponse(str(_DASHBOARD))
     return HTMLResponse("<h1>OpenYantra</h1><p>Dashboard not found. Run yantra bootstrap first.</p>")
+
+@app.get("/hud", response_class=HTMLResponse)
+async def hud_view():
+    if _HUD.exists():
+        return FileResponse(str(_HUD))
+    return HTMLResponse("<h1>OpenYantra HUD</h1><p>HUD template not found.</p>")
 
 @app.get("/api/health")
 async def api_health(): return get_oy().health_check()
@@ -318,7 +336,10 @@ async def post_settings(req: Request):
         try:
             from openyantra.core import _VIDYAKOSHA_AVAILABLE
             if _VIDYAKOSHA_AVAILABLE:
-                from vidyakosha import VidyaKosha as _VK
+                try:
+                    from openyantra.vidyakosha import VidyaKosha as _VK
+                except ImportError:
+                    from vidyakosha import VidyaKosha as _VK
                 oy._vidyakosha = _VK(str(Path(oy.path).parent), embedder_pref=current.get("embedder", "auto"))
                 oy._vidyakosha.sync(oy.path)
         except Exception as e:
@@ -600,10 +621,10 @@ async def api_context_compile(req: Request):
 
 @app.get("/api/context/preview")
 async def api_context_preview(
-    query: str | None = None,
+    query: Optional[str] = None,
     budget: int = 4096,
     mode: str = "default",
-    sections: str | None = None
+    sections: Optional[str] = None
 ):
     oy = get_oy()
     sections_list = None
@@ -701,8 +722,50 @@ async def api_graph_traverse(source_type: str, source_id: str, max_hops: int = 3
     return {"nodes": nodes, "source_type": source_type, "source_id": source_id}
 
 
+# ── Nidra & Vault API (v6.0) ──────────────────────────────────────────────────
+
+@app.post("/api/nidra/consolidate")
+async def api_nidra_consolidate(req: Request):
+    """Trigger autonomous cognitive consolidation pass (Nidra)."""
+    oy = get_oy()
+    data = {}
+    try:
+        data = await req.json()
+    except Exception:
+        pass
+    dry_run = bool(data.get("dry_run", False))
+    provider = str(data.get("provider", "auto"))
+
+    from openyantra.yantra_nidra import NidraConsolidator
+    nidra = NidraConsolidator(oy)
+    report = nidra.consolidate(dry_run=dry_run, provider=provider)
+    return report
+
+
+@app.post("/api/vault/sync")
+async def api_vault_sync(req: Request):
+    """Bi-directional sync with Obsidian Markdown vault."""
+    oy = get_oy()
+    data = {}
+    try:
+        data = await req.json()
+    except Exception:
+        pass
+    vault_path = data.get("path", "~/openyantra_vault")
+    from openyantra.yantra_vault import VaultSync
+    sync = VaultSync(oy, vault_path)
+    imp_res = sync.import_vault()
+    exp_res = sync.export_vault()
+    return {
+        "status": "success",
+        "vault_dir": str(sync.vault_dir),
+        "imported": imp_res,
+        "exported": exp_res
+    }
+
+
 def main():
-    parser = argparse.ArgumentParser(description="OpenYantra Dashboard v5.0.0")
+    parser = argparse.ArgumentParser(description="OpenYantra Dashboard v6.2.0")
     parser.add_argument("--file","-f",default=str(Path.home()/"openyantra"/"chitrapat.ods"))
     parser.add_argument("--port","-p",type=int,default=7331)
     parser.add_argument("--host",default="127.0.0.1")
@@ -714,7 +777,7 @@ def main():
     _oy = OpenYantra(str(path), agent_name="Yantra-UI")
     _cog_store = CognitiveMemoryStore(path.parent / "cognitive_memories.json")
     h = _oy.health_check()
-    print(f"\n{'='*50}\n  OpenYantra Dashboard v5.0.0\n  → http://{args.host}:{args.port}\n  Loops:{h.get('open_loops',0)} Inbox:{h.get('inbox_pending',0)}\n{'='*50}\n")
+    print(f"\n{'='*50}\n  OpenYantra Dashboard v6.2.0 (Akasha & Sutra)\n  → http://{args.host}:{args.port}\n  Loops:{h.get('open_loops',0)} Inbox:{h.get('inbox_pending',0)}\n{'='*50}\n")
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
 
 if __name__ == "__main__":

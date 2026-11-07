@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════
-#  OpenYantra v2.12 Installer -- Windows (PowerShell)
+#  OpenYantra v5.0.0 Installer -- Windows (PowerShell)
 #  The Sacred Memory Machine
 #  Inspired by Chitragupta, the Hindu God of Data
 #
@@ -14,7 +14,7 @@
 # ═══════════════════════════════════════════════════════════════
 
 $ErrorActionPreference = "Stop"
-$VERSION = "4.1.0"
+$VERSION = "6.2.0"
 $INSTALL_DIR = "$env:USERPROFILE\openyantra"
 $VENV_DIR    = "$INSTALL_DIR\.venv"
 $RAW         = "https://raw.githubusercontent.com/revanthlevaka/OpenYantra/main"
@@ -138,7 +138,7 @@ function Install-Deps {
     $deps = @(
         "odfpy", "pandas", "scikit-learn", "faiss-cpu",
         "fastapi", "uvicorn[standard]", "python-telegram-bot",
-        "requests", "schedule"
+        "requests", "schedule", "webauthn", "aiosmtpd"
     )
 
     Write-Info "Installing: $($deps -join ', ')"
@@ -152,7 +152,7 @@ function Install-Deps {
 function Download-Files {
     Write-Step "Downloading OpenYantra v$VERSION files"
 
-    $dirs = @("openclaw", "examples", "references", "docs", "assets")
+    $dirs = @("openclaw", "examples", "references", "docs", "assets", "UI\v4")
     foreach ($d in $dirs) {
         New-Item -ItemType Directory -Path "$INSTALL_DIR\$d" -Force | Out-Null
     }
@@ -164,13 +164,20 @@ function Download-Files {
         "openyantra/ios_shortcut.py", "openyantra/yantra_mail.py",
         "openyantra/yantra_migrate.py", "openyantra/yantra_security.py",
         "openyantra/yantra_morning.py", "openyantra/yantra_context.py",
-        "openyantra/yantra_sqlite.py", "openyantra/cognitive_mcp.py",
+        "openyantra/yantra_sqlite.py", "openyantra/yantra_passkey.py",
+        "openyantra/yantra_sutra.py", "openyantra/yantra_nidra.py",
+        "openyantra/yantra_vault.py", "openyantra/mcp_setup.py",
+        "openyantra/adapters/__init__.py", "openyantra/adapters/langchain.py",
+        "openyantra/adapters/crewai.py", "openyantra/yantra_git.py",
+        "openyantra/yantra_tui.py", "openyantra/desktop.py",
+        "openyantra/cognitive_mcp.py",
         "openyantra/cognitive_db.py", "openyantra/chitrapat_template.ods",
         "openclaw/hooks.py", "openclaw/plugin.py", "openclaw/__init__.py",
         "examples/bootstrap.py", "examples/langchain_adapter.py",
         "examples/__init__.py", "references/controlled-vocab.md",
         "docs/DEPLOYMENT.md", "PROTOCOL.md", "SKILL.md",
-        "MYTHOLOGY.md", "WHITEPAPER.md"
+        "MYTHOLOGY.md", "WHITEPAPER.md", "UI/v4/dashboard.html",
+        "UI/v4/hud.html"
     )
 
     foreach ($file in $files) {

@@ -9,7 +9,10 @@ import json
 import traceback
 import argparse
 from pathlib import Path
-from cognitive_db import CognitiveMemoryStore
+try:
+    from openyantra.cognitive_db import CognitiveMemoryStore
+except ImportError:
+    from cognitive_db import CognitiveMemoryStore
 
 # Map short sheet names to correct OpenYantra SHEET constants
 SHEET_MAP = {
