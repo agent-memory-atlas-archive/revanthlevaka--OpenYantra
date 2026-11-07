@@ -7,6 +7,7 @@
 <h4 align="center"><em>यन्त्र -- Inspired by Chitragupta, the Hindu God of Data</em></h4>
 
 <p align="center">
+  <a href="https://github.com/revanthlevaka/OpenYantra/actions/workflows/ci.yml"><img src="https://github.com/revanthlevaka/OpenYantra/actions/workflows/ci.yml/badge.svg" alt="OpenYantra CI" /></a>
   <img src="https://img.shields.io/badge/Core%20Engine-v6.2.0-saffron?style=flat-square&color=FF9933" />
   <img src="https://img.shields.io/badge/Desktop%20App-v1.0.0-blueviolet?style=flat-square" />
   <img src="https://img.shields.io/badge/MCP-Claude%20%26%20Cursor-success?style=flat-square&color=10b981" />
