@@ -406,12 +406,14 @@ class Raksha:
             except Exception:
                 pass
 
-        except Exception as e:
+        except Exception:
+            import logging
+            logging.getLogger("openyantra").exception("audit_chitrapat could not read the file")
             findings.append({
                 "sheet": "system",
                 "threat_level": "suspicious",
                 "threat_type": "schema_corruption",
-                "threats_found": [f"Could not read Chitrapat: {e}"],
+                "threats_found": ["Could not read Chitrapat (see the server log)"],
                 "preview": str(oy_path),
             })
 

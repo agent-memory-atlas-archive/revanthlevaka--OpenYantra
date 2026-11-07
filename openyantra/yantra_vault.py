@@ -31,17 +31,15 @@ class VaultSync:
         in OPENYANTRA_VAULT_ROOT (os.pathsep separated). Stops a request from
         pointing the vault at system or other users' directories.
         """
-        target = Path(vault_dir).expanduser().resolve()
-        roots = [Path.home().resolve(), Path(tempfile.gettempdir()).resolve()]
+        target = os.path.realpath(os.path.expanduser(str(vault_dir)))
+        roots = [os.path.realpath(os.path.expanduser("~")),
+                 os.path.realpath(tempfile.gettempdir())]
         for extra in os.environ.get("OPENYANTRA_VAULT_ROOT", "").split(os.pathsep):
             if extra.strip():
-                roots.append(Path(extra).expanduser().resolve())
+                roots.append(os.path.realpath(os.path.expanduser(extra)))
         for root in roots:
-            try:
-                target.relative_to(root)
-                return target
-            except ValueError:
-                continue
+            if target == root or target.startswith(root.rstrip(os.sep) + os.sep):
+                return Path(target)
         raise ValueError("vault path must be inside your home directory "
                          "(or a root listed in OPENYANTRA_VAULT_ROOT)")
 
