@@ -1,91 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OpenYantra HUD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+  // Follow the system theme (same data-theme switch as the dashboard)
+  (function () {
+    try {
+      var mq = window.matchMedia('(prefers-color-scheme: light)');
+      var apply = function () { document.documentElement.setAttribute('data-theme', mq.matches ? 'light' : 'dark'); };
+      apply();
+      if (mq.addEventListener) mq.addEventListener('change', apply);
+    } catch (e) {}
+  })();
+</script>
 <style>
+/* OpenYantra design tokens -- identical to UI/v4/dashboard.html */
+:root, [data-theme="dark"] {
+  --ink:        #0a0a0b;
+  --surface:    #111113;
+  --surface2:   #161618;
+  --surface3:   #1c1b1f;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.12);
+  --dim:        #242228;
+  --muted:      #524f58;
+  --subtle:     #7a7682;
+  --text:       #e8e5de;
+  --text-dim:   rgba(232,229,222,0.55);
+  --grid-line:  rgba(255,255,255,0.018);
+  --scrollbar:  #242228;
+}
+[data-theme="light"] {
+  --ink:        #f3f1ec;
+  --surface:    #ffffff;
+  --surface2:   #ece9e2;
+  --surface3:   #e4e0d8;
+  --border:     rgba(0,0,0,0.09);
+  --border2:    rgba(0,0,0,0.16);
+  --dim:        #d0ccc4;
+  --muted:      #888380;
+  --subtle:     #555250;
+  --text:       #1a1820;
+  --text-dim:   rgba(26,24,32,0.56);
+  --grid-line:  rgba(0,0,0,0.04);
+  --scrollbar:  #d0ccc4;
+}
 :root {
-  --bg: #090a0f;
-  --surface: #12141c;
-  --surface-hover: #1b1e2a;
-  --border: #242938;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --saffron: #f5a000;
-  --gold: #d4af37;
-  --green: #10b981;
-  --blue: #3b82f6;
-  --coral: #ef4444;
-  --radius: 8px;
-  --mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  --blue:    #1c6fff;
+  --indigo:  #5535e0;
+  --coral:   #e84520;
+  --amber:   #f5a000;
+  --green:   #1aa167;
+  --grad:    linear-gradient(135deg,#1c6fff 0%,#5535e0 32%,#e84520 66%,#f5a000 100%);
+  --grad-h:  linear-gradient(90deg,#1c6fff 0%,#5535e0 32%,#e84520 66%,#f5a000 100%);
+  --grad-t:  linear-gradient(135deg,#1c6fff,#5535e0 40%,#e84520 70%,#f5a000);
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans', sans-serif;
+  --tr:      background 0.28s,color 0.28s,border-color 0.28s;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg);
+  background: var(--ink);
   color: var(--text);
   font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
   overflow: hidden;
   user-select: none;
   -webkit-app-region: drag;
   height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: var(--tr);
+}
+
+/* 32px graph-paper grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 .hud-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
-  border: 1px solid var(--border);
-  background: rgba(18, 20, 28, 0.95);
-  backdrop-filter: blur(20px);
+  border: 1px solid var(--border2);
 }
 
 .hud-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(9, 10, 15, 0.5);
+  background: var(--surface);
+  transition: var(--tr);
+}
+/* page-head gradient rule */
+.hud-header::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: var(--grad-h);
 }
 
 .hud-brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--saffron);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.hud-brand .wm-open {
+  font-weight: 500;
+  background: var(--grad-t);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hud-brand .wm-yantra { font-weight: 300; color: var(--text); }
+.hud-brand .wm-tag {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: 4px;
 }
 
 .hud-tabs {
   display: flex;
-  gap: 4px;
+  gap: 0;
   -webkit-app-region: no-drag;
 }
 
 .tab-btn {
+  position: relative;
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
   color: var(--muted);
   font-family: var(--mono);
   font-size: 10px;
-  padding: 3px 8px;
-  border-radius: 4px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 6px 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: var(--tr);
 }
-
-.tab-btn:hover { color: var(--text); background: var(--surface); }
+.tab-btn:hover { color: var(--text); background: var(--surface2); }
 .tab-btn.active {
-  color: var(--saffron);
-  border-color: rgba(245, 160, 0, 0.3);
-  background: rgba(245, 160, 0, 0.08);
+  color: var(--text);
+  background: var(--surface2);
+  box-shadow: none;
+  border-bottom: 1px solid var(--amber);
 }
 
 .hud-content {
@@ -99,21 +181,43 @@ body {
 
 .input-box {
   width: 100%;
-  background: var(--surface);
+  background: var(--surface2);
   border: 1px solid var(--border);
   color: var(--text);
   font-family: var(--mono);
   font-size: 12px;
   padding: 10px 12px;
-  border-radius: var(--radius);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: var(--tr);
+}
+.input-box::placeholder { color: var(--text-dim); }
+.input-box:focus { border-color: var(--amber); }
+
+.btn-p {
+  background: var(--grad);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn-p:disabled { opacity: 0.5; cursor: default; }
+
+.label {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
-.input-box:focus {
-  border-color: var(--saffron);
-  box-shadow: 0 0 0 1px rgba(245, 160, 0, 0.25);
-}
+.hint { font-size: 10px; color: var(--text-dim); line-height: 1.8; margin-top: 12px; }
+.hint code { font-family: var(--mono); }
+.hint .c-project { color: var(--blue); }
+.hint .c-person  { color: var(--indigo); }
+.hint .c-urgent  { color: var(--coral); }
 
 .results-list {
   flex: 1;
@@ -121,39 +225,28 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
+.results-list::-webkit-scrollbar { width: 2px; }
+.results-list::-webkit-scrollbar-thumb { background: var(--scrollbar); }
 
 .result-item {
   display: flex;
   flex-direction: column;
-  background: var(--surface);
+  background: var(--surface2);
   border: 1px solid var(--border);
   padding: 8px 10px;
-  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: var(--tr);
 }
-
-.result-item:hover, .result-item.selected {
-  background: var(--surface-hover);
-  border-color: var(--saffron);
-}
+.result-item:hover, .result-item.selected { border-color: var(--amber); }
 
 .result-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
-  color: var(--muted);
   margin-bottom: 3px;
 }
-
-.result-badge {
-  color: var(--saffron);
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
+.result-badge { color: var(--amber); }
 .result-text {
   font-size: 11px;
   color: var(--text);
@@ -161,6 +254,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.state-msg { font-size: 10px; color: var(--text-dim); padding: 8px; }
+.state-msg.err { color: var(--coral); }
 
 .hud-footer {
   display: flex;
@@ -168,26 +263,37 @@ body {
   justify-content: space-between;
   padding: 8px 14px;
   border-top: 1px solid var(--border);
-  font-size: 9px;
-  color: var(--muted);
-  background: rgba(9, 10, 15, 0.7);
-}
-
-.shortcuts-hint kbd {
+  font-size: 10px;
+  color: var(--text-dim);
   background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 1px 4px;
-  border-radius: 3px;
+  transition: var(--tr);
+}
+.shortcuts-hint kbd {
+  font-family: var(--mono);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  padding: 1px 5px;
   color: var(--text);
 }
+.status { display: inline-flex; align-items: center; gap: 6px; color: var(--text-dim); }
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+[data-theme="light"] .result-badge, [data-theme="light"] #dream-status { color: var(--subtle) !important; }
+[data-theme="light"] #toast { color: var(--text) !important; }
 
 #toast {
   position: absolute;
-  top: 45px;
+  top: 52px;
   right: 14px;
   padding: 6px 10px;
-  border-radius: 4px;
   font-size: 10px;
+  letter-spacing: 0.04em;
   background: var(--surface);
   border: 1px solid var(--green);
   color: var(--green);
@@ -201,30 +307,41 @@ body {
 <div class="hud-container">
   <div class="hud-header">
     <div class="hud-brand">
-      <svg width="14" height="14" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="50" r="46" stroke="#f5a000" stroke-width="6"/>
-        <circle cx="50" cy="50" r="28" stroke="#f5a000" stroke-width="4"/>
-        <circle cx="50" cy="50" r="8" fill="#f5a000"/>
+      <svg width="16" height="16" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="hud-g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1c6fff"/>
+            <stop offset="33%" stop-color="#5535e0"/>
+            <stop offset="66%" stop-color="#e84520"/>
+            <stop offset="100%" stop-color="#f5a000"/>
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="46" stroke="url(#hud-g)" stroke-width="6"/>
+        <circle cx="50" cy="50" r="28" stroke="url(#hud-g)" stroke-width="4"/>
+        <circle cx="50" cy="50" r="8" fill="url(#hud-g)"/>
+        <circle cx="50" cy="3" r="3" fill="#1c6fff"/>
+        <circle cx="97" cy="50" r="3" fill="#5535e0"/>
+        <circle cx="50" cy="97" r="3" fill="#e84520"/>
+        <circle cx="3" cy="50" r="3" fill="#f5a000"/>
       </svg>
-      OpenYantra HUD
+      <span><span class="wm-open">Open</span><span class="wm-yantra">Yantra</span></span>
+      <span class="wm-tag">HUD</span>
     </div>
     <div class="hud-tabs">
-      <button class="tab-btn active" id="tab-capture" onclick="switchTab('capture')">📥 Capture</button>
-      <button class="tab-btn" id="tab-recall" onclick="switchTab('recall')">🔍 Recall</button>
-      <button class="tab-btn" id="tab-dream" onclick="switchTab('dream')">🌙 Dream</button>
+      <button class="tab-btn active" id="tab-capture" onclick="switchTab('capture')">Capture</button>
+      <button class="tab-btn" id="tab-recall" onclick="switchTab('recall')">Recall</button>
+      <button class="tab-btn" id="tab-dream" onclick="switchTab('dream')">Dream</button>
     </div>
   </div>
 
   <div class="hud-content">
     <div id="capture-view">
-      <input type="text" id="capture-input" class="input-box" placeholder="Capture to inbox... (use #project, @person, !urgent)" autofocus />
-      <div class="results-list" style="margin-top: 12px;">
-        <div style="font-size: 10px; color: var(--muted); line-height: 1.6;">
-          • Type anything to dump immediately into your Chitrapat Inbox.<br/>
-          • Add <code style="color:var(--saffron)">#project</code> to associate with a project.<br/>
-          • Add <code style="color:var(--blue)">@name</code> to log context for a person.<br/>
-          • Add <code style="color:var(--coral)">!urgent</code> to create an urgent Open Loop.
-        </div>
+      <input type="text" id="capture-input" class="input-box" placeholder="Capture to inbox -- use #project, @person, !urgent" autofocus />
+      <div class="hint">
+        Type anything to drop it straight into your Chitrapat Inbox.<br/>
+        Add <code class="c-project">#project</code> to associate with a project.<br/>
+        Add <code class="c-person">@name</code> to log context for a person.<br/>
+        Add <code class="c-urgent">!urgent</code> to create an urgent Open Loop.
       </div>
     </div>
 
@@ -234,19 +351,17 @@ body {
     </div>
 
     <div id="dream-view" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
-      <p style="font-size: 11px; color: var(--muted); margin-bottom: 14px;">
+      <p style="font-family: var(--sans); font-weight: 300; font-size: 13px; line-height: 1.7; color: var(--text-dim); margin-bottom: 14px; max-width: 460px;">
         Nidra clusters your episodic sessions, resolves finished loops, and promotes preferences into core beliefs.
       </p>
-      <button id="dream-btn" onclick="triggerDream()" class="tab-btn active" style="padding: 8px 16px; font-size: 11px;">
-        🌙 Consolidate Memory Now
-      </button>
-      <div id="dream-status" style="font-size: 10px; color: var(--saffron); margin-top: 12px; min-height: 16px;"></div>
+      <button id="dream-btn" onclick="triggerDream()" class="btn-p">Consolidate memory now</button>
+      <div id="dream-status" style="font-size: 10px; color: var(--amber); margin-top: 12px; min-height: 16px;"></div>
     </div>
   </div>
 
   <div class="hud-footer">
-    <span class="shortcuts-hint"><kbd>Enter</kbd> Save / Select · <kbd>Tab</kbd> Switch · <kbd>Esc</kbd> Close</span>
-    <span id="loop-count" style="color: var(--saffron);">● Ready</span>
+    <span class="shortcuts-hint"><kbd>Enter</kbd> Save / Select &nbsp; <kbd>Tab</kbd> Switch &nbsp; <kbd>Esc</kbd> Close</span>
+    <span id="loop-count" class="status"><span class="status-dot"></span>Ready</span>
   </div>
 </div>
 
@@ -254,6 +369,10 @@ body {
 
 <script>
 let currentTab = 'capture';
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 function showToast(msg, ok=true) {
   const t = document.getElementById('toast');
@@ -312,7 +431,7 @@ document.getElementById('recall-input').addEventListener('input', (e) => {
 
 async function doSearch(q) {
   const container = document.getElementById('results');
-  container.innerHTML = '<div style="font-size:10px; color:var(--muted); padding:8px;">Searching...</div>';
+  container.innerHTML = '<div class="state-msg">Searching...</div>';
   try {
     const res = await fetch(`/api/sheet/beliefs`);
     const d = await res.json();
@@ -322,7 +441,7 @@ async function doSearch(q) {
     }).slice(0, 10);
 
     if (!rows.length) {
-      container.innerHTML = '<div style="font-size:10px; color:var(--muted); padding:8px;">No matches found.</div>';
+      container.innerHTML = '<div class="state-msg">No matches found.</div>';
       return;
     }
 
@@ -330,31 +449,31 @@ async function doSearch(q) {
       const stmt = r['Belief / Principle'] || r['Topic'] || r['Project'] || JSON.stringify(r);
       const domain = r['Domain'] || 'Belief';
       return `
-        <div class="result-item" onclick="copyRecall('${encodeURIComponent(stmt)}')">
-          <div class="result-meta">
-            <span class="result-badge">${domain}</span>
+        <div class="result-item" data-text="${esc(encodeURIComponent(stmt))}" onclick="copyRecall(this.dataset.text)">
+          <div class="result-meta label">
+            <span class="result-badge">${esc(domain)}</span>
             <span>Click to copy</span>
           </div>
-          <div class="result-text">${stmt}</div>
+          <div class="result-text">${esc(stmt)}</div>
         </div>
       `;
     }).join('');
   } catch(e) {
-    container.innerHTML = '<div style="font-size:10px; color:var(--coral); padding:8px;">Search unavailable.</div>';
+    container.innerHTML = '<div class="state-msg err">Search unavailable.</div>';
   }
 }
 
 function copyRecall(encoded) {
   const text = decodeURIComponent(encoded);
   navigator.clipboard.writeText(text);
-  showToast('Copied to clipboard!');
+  showToast('Copied to clipboard');
 }
 
 async function triggerDream() {
   const status = document.getElementById('dream-status');
   const btn = document.getElementById('dream-btn');
   btn.disabled = true;
-  status.textContent = '🌙 Nidra consolidation running...';
+  status.textContent = 'Nidra consolidation running...';
   try {
     const res = await fetch('/api/nidra/consolidate', {
       method: 'POST',
@@ -362,7 +481,7 @@ async function triggerDream() {
       body: JSON.stringify({ dry_run: false, provider: 'auto' })
     });
     const d = await res.json();
-    status.textContent = `✨ Clustered ${d.sessions_clustered} sessions · Resolved ${d.loops_resolved ? d.loops_resolved.length : 0} loops!`;
+    status.textContent = `Clustered ${d.sessions_clustered} sessions -- resolved ${d.loops_resolved ? d.loops_resolved.length : 0} loops`;
     showToast('Consolidation complete');
   } catch(e) {
     status.textContent = 'Consolidation error';

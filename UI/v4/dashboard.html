@@ -97,6 +97,13 @@ nav{position:fixed;top:52px;left:0;bottom:0;width:200px;z-index:99;background:va
 nav::-webkit-scrollbar{width:2px;}
 .ntab{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 20px;background:transparent;border:none;border-bottom:1px solid var(--border);border-right:none;color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:12px;width:100%;text-align:left;transition:var(--tr);}
 .ntab span{transition:opacity 0.28s var(--ease), width 0.28s var(--ease);}
+.ntab .ni{font-style:normal;font-size:9px;letter-spacing:0.08em;color:var(--muted);width:20px;flex:none;transition:var(--tr);}
+.ntab.active .ni,.ntab:hover .ni{color:var(--amber);}
+.ntab .nc{margin-left:auto;font-weight:400;font-size:9px;letter-spacing:0.04em;line-height:1;padding:3px 6px;min-width:20px;text-align:center;color:var(--text-dim);border:1px solid var(--border2);}
+.ntab .nc:empty{display:none;}
+.ntab .nc.hot{color:var(--amber);border-color:var(--amber);}
+.ntab .nc.alert{color:var(--coral);border-color:var(--coral);}
+
 .ntab:hover{color:var(--text);background:var(--surface2);}
 .ntab.active{color:var(--text);border-left:3px solid var(--amber);background:var(--surface2);padding-left:17px;}
 
@@ -104,7 +111,8 @@ main{margin-top:52px;padding:24px;margin-left:200px;padding-bottom:80px;position
 
 /* Collapsed Sidebar overrides */
 body.sidebar-collapsed nav{width:60px;}
-body.sidebar-collapsed .ntab span{opacity:0;pointer-events:none;width:0;display:none;}
+body.sidebar-collapsed .ntab span,body.sidebar-collapsed .ntab .nc{opacity:0;pointer-events:none;width:0;display:none;}
+body.sidebar-collapsed .ntab .ni{width:auto;}
 body.sidebar-collapsed .ntab{padding:14px 0;justify-content:center;}
 body.sidebar-collapsed .ntab.active{padding-left:0;border-left:3px solid var(--amber);}
 body.sidebar-collapsed main{margin-left:60px;}
@@ -156,7 +164,7 @@ tr:hover td{background:var(--surface2);}
 .ti-act button:hover{border-color:var(--amber);color:var(--amber);}
 
 /* Oracle card */
-.oracle-card{background:linear-gradient(135deg,#0e1628,#161830);border:1px solid rgba(28,111,255,0.25);padding:14px 18px;margin-bottom:12px;transition:var(--tr);}
+.oracle-card{background:var(--surface2);border:1px solid var(--border2);border-left:2px solid var(--blue);padding:14px 18px;margin-bottom:12px;transition:var(--tr);}
 .oracle-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .oracle-card-title{font-size:11px;font-weight:500;color:var(--blue);letter-spacing:0.04em;}
 .oracle-item{padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);transition:var(--tr);}
@@ -166,7 +174,7 @@ tr:hover td{background:var(--surface2);}
 .oracle-action{font-size:9px;color:var(--blue);margin-top:2px;}
 
 /* Insight card (morning brief) */
-.insight-card{background:linear-gradient(135deg,#1e1630,#241832);border:1px solid rgba(255,153,51,0.25);padding:14px 18px;margin-bottom:12px;}
+.insight-card{background:var(--surface2);border:1px solid var(--border2);border-left:2px solid var(--amber);padding:14px 18px;margin-bottom:12px;}
 
 /* Inbox */
 .ibf{display:flex;gap:8px;margin-bottom:12px;}
@@ -279,7 +287,7 @@ tr:hover td{background:var(--surface2);}
   border-color: var(--blue);
 }
 .agent-node.selected {
-  border-color: var(--amber); box-shadow: 0 0 10px rgba(245,160,0,0.2);
+  border-color: var(--amber);
 }
 </style>
 </head>
@@ -318,9 +326,9 @@ tr:hover td{background:var(--surface2);}
     <span class="hdr-badge">v6.2.0</span>
   </div>
   <div class="hdr-r">
-    <button id="nidraBtn" class="btn" style="font-size:9px; padding:3px 7px; border-color:var(--border2); align-items:center; gap:3px;" onclick="triggerNidra()" title="Run Nidra Sleep & Memory Consolidation">🌙 Dream</button>
-    <button id="vaultBtn" class="btn" style="font-size:9px; padding:3px 7px; border-color:var(--border2); align-items:center; gap:3px;" onclick="triggerVaultSync()" title="Sync with Obsidian Vault">📓 Sync Vault</button>
-    <button id="lockBtn" class="btn" style="display:none; font-size:9px; padding:3px 6px; border-color:var(--border2); margin-right:8px; align-items:center; gap:3px;" onclick="lockYantraManual()">🔒 Lock</button>
+    <button id="nidraBtn" class="btn" style="font-size:9px; padding:3px 7px; border-color:var(--border2); align-items:center; gap:3px;" onclick="triggerNidra()" title="Run Nidra Sleep & Memory Consolidation">Dream</button>
+    <button id="vaultBtn" class="btn" style="font-size:9px; padding:3px 7px; border-color:var(--border2); align-items:center; gap:3px;" onclick="triggerVaultSync()" title="Sync with Obsidian Vault">Sync Vault</button>
+    <button id="lockBtn" class="btn" style="display:none; font-size:9px; padding:3px 6px; border-color:var(--border2); margin-right:8px; align-items:center; gap:3px;" onclick="lockYantraManual()">Lock</button>
     <span style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--green)"><span class="status-dot"></span>Chitragupta active</span>
     <div class="theme-row" id="tr">
       <button class="th-btn" data-mode="light">
@@ -361,21 +369,21 @@ tr:hover td{background:var(--surface2);}
 </div>
 
 <nav>
-  <button class="ntab active" onclick="go('today',this)">🌅 <span>Today</span></button>
-  <button class="ntab" onclick="go('inbox',this)">📥 <span>Inbox</span></button>
-  <button class="ntab" onclick="go('loops',this)">🔓 <span>Loops</span></button>
-  <button class="ntab" onclick="go('projects',this)">🚀 <span>Projects</span></button>
-  <button class="ntab" onclick="go('oracle',this)">🔮 <span>Oracle</span></button>
-  <button class="ntab" onclick="go('review',this)">✏️ <span>Review</span></button>
-  <button class="ntab" onclick="go('timeline',this)">📅 <span>Timeline</span></button>
-  <button class="ntab" onclick="go('security',this)">🔒 <span>Security</span></button>
-  <button class="ntab" onclick="go('ledger',this)">📒 <span>Ledger</span></button>
-  <button class="ntab" onclick="go('health',this)">💚 <span>Health</span></button>
-  <button class="ntab" onclick="go('cognitive_memories',this)">🧠 <span>Memories</span></button>
-  <button class="ntab" onclick="go('cognitive_hierarchy',this)">👥 <span>Hierarchy</span></button>
-  <button class="ntab" onclick="go('cognitive_graph',this)">🕸️ <span>Graph</span></button>
-  <button class="ntab" onclick="go('context_compile',this)">📖 <span>Context</span></button>
-  <button class="ntab" onclick="go('config_settings',this)">⚙️ <span>Settings</span></button>
+  <button class="ntab active" onclick="go('today',this)" title="Today"><i class="ni">TD</i><span>Today</span><b class="nc" id="nc-today"></b></button>
+  <button class="ntab" onclick="go('inbox',this)" title="Inbox"><i class="ni">IN</i><span>Inbox</span><b class="nc" id="nc-inbox"></b></button>
+  <button class="ntab" onclick="go('loops',this)" title="Loops"><i class="ni">LP</i><span>Loops</span><b class="nc" id="nc-loops"></b></button>
+  <button class="ntab" onclick="go('projects',this)" title="Projects"><i class="ni">PJ</i><span>Projects</span><b class="nc" id="nc-projects"></b></button>
+  <button class="ntab" onclick="go('oracle',this)" title="Oracle"><i class="ni">OR</i><span>Oracle</span><b class="nc" id="nc-oracle"></b></button>
+  <button class="ntab" onclick="go('review',this)" title="Review"><i class="ni">RV</i><span>Review</span><b class="nc" id="nc-review"></b></button>
+  <button class="ntab" onclick="go('timeline',this)" title="Timeline"><i class="ni">TL</i><span>Timeline</span><b class="nc" id="nc-timeline"></b></button>
+  <button class="ntab" onclick="go('security',this)" title="Security"><i class="ni">SC</i><span>Security</span><b class="nc" id="nc-security"></b></button>
+  <button class="ntab" onclick="go('ledger',this)" title="Ledger"><i class="ni">LG</i><span>Ledger</span><b class="nc" id="nc-ledger"></b></button>
+  <button class="ntab" onclick="go('health',this)" title="Health"><i class="ni">HL</i><span>Health</span><b class="nc" id="nc-health"></b></button>
+  <button class="ntab" onclick="go('cognitive_memories',this)" title="Memories"><i class="ni">MM</i><span>Memories</span><b class="nc" id="nc-cognitive_memories"></b></button>
+  <button class="ntab" onclick="go('cognitive_hierarchy',this)" title="Hierarchy"><i class="ni">HR</i><span>Hierarchy</span><b class="nc" id="nc-cognitive_hierarchy"></b></button>
+  <button class="ntab" onclick="go('cognitive_graph',this)" title="Graph"><i class="ni">GR</i><span>Graph</span><b class="nc" id="nc-cognitive_graph"></b></button>
+  <button class="ntab" onclick="go('context_compile',this)" title="Context"><i class="ni">CX</i><span>Context</span><b class="nc" id="nc-context_compile"></b></button>
+  <button class="ntab" onclick="go('config_settings',this)" title="Settings"><i class="ni">ST</i><span>Settings</span><b class="nc" id="nc-config_settings"></b></button>
 </nav>
 
 <main>
@@ -611,7 +619,7 @@ async function lockYantraManual() {
 
 async function triggerNidra() {
   const btn = document.getElementById('nidraBtn');
-  if (btn) btn.textContent = '🌙 Dreaming...';
+  if (btn) btn.textContent = 'Dreaming...';
   toast('Starting Nidra sleep consolidation pass...');
   try {
     const res = await api('/api/nidra/consolidate', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ dry_run: false, provider: 'auto' }) });
@@ -624,13 +632,13 @@ async function triggerNidra() {
   } catch(e) {
     toast('Error during consolidation', false);
   } finally {
-    if (btn) btn.textContent = '🌙 Dream';
+    if (btn) btn.textContent = 'Dream';
   }
 }
 
 async function triggerVaultSync() {
   const btn = document.getElementById('vaultBtn');
-  if (btn) btn.textContent = '📓 Syncing...';
+  if (btn) btn.textContent = 'Syncing...';
   toast('Syncing Obsidian Vault...');
   try {
     const res = await api('/api/vault/sync', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({}) });
@@ -646,7 +654,7 @@ async function triggerVaultSync() {
   } catch(e) {
     toast('Error syncing vault', false);
   } finally {
-    if (btn) btn.textContent = '📓 Sync Vault';
+    if (btn) btn.textContent = 'Sync Vault';
   }
 }
 const ptag = s=>{if(!s)return'';const m={'Active':'b-ok','Pending':'b-md','High':'b-hi','Critical':'b-hi','Medium':'b-md','Low':'b-lo','Done':'b-lo','written':'b-ok','confirmed':'b-hi','suspicious':'b-md','clean':'b-ok'};return`<span class="badge ${m[s]||''}">${s}</span>`;};
@@ -657,13 +665,35 @@ const tbl = (rows,cols)=>{
   return h+'</table>';
 };
 
+
+// Menu tab counts
+function setNc(k,n,cls){
+  const el=document.getElementById('nc-'+k); if(!el)return;
+  el.className='nc'+(cls&&n>0?' '+cls:'');
+  el.textContent=(n===null||n===undefined)?'':String(n);
+}
+async function refreshNavCounts(){
+  try{
+    const [h,pr,od,lg,qr,cm]=await Promise.all([
+      api('/api/health'),api('/api/sheet/projects'),api('/api/oracle'),
+      api('/api/sheet/ledger'),api('/api/sheet/quarantine'),api('/api/cognitive/memories')
+    ]);
+    if(h&&!h.error){setNc('inbox',h.inbox_pending||0,'hot');setNc('loops',h.open_loops||0,'hot');setNc('review',h.corrections_pending||0,'hot');}
+    if(pr&&pr.rows)setNc('projects',pr.rows.filter(r=>String(r['Status']||'Active').toLowerCase()==='active'&&r['Project']).length);
+    if(od&&typeof od.count==='number')setNc('oracle',od.count,'hot');
+    if(lg&&lg.rows){const w=lg.rows.filter(r=>r['Status']==='written').length;setNc('timeline',w);setNc('ledger',lg.rows.length);}
+    if(qr&&qr.rows)setNc('security',qr.rows.filter(r=>r['Status']==='Quarantined').length,'alert');
+    if(cm&&cm.memories)setNc('cognitive_memories',cm.memories.length);
+  }catch(e){console.warn('nav counts',e);}
+}
+
 let cur='today';
 function go(name,btn){
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
   document.getElementById(name).classList.add('active');
   if(btn)btn.classList.add('active');
-  cur=name; load(name);
+  cur=name; load(name).then(refreshNavCounts);
 }
 
 async function load(name){
@@ -693,14 +723,14 @@ async function loadToday(){
   ].map(c=>`<div class="card ${c.c}" onclick="goTo('${c.t}')"><div class="cn" style="color:var(--amber)">${c.n}</div><div class="ck">${c.k}</div></div>`).join('');
 
   // Copy context button
-  const ctxBtn=`<div class="ctx-btn"><button class="btn-p" onclick="copyCtx()">📋 Copy Context</button><span class="ctx-hint">Paste into Claude.ai, ChatGPT, or any AI chat</span></div>`;
+  const ctxBtn=`<div class="ctx-btn"><button class="btn-p" onclick="copyCtx()">Copy Context</button><span class="ctx-hint">Paste into Claude.ai, ChatGPT, or any AI chat</span></div>`;
 
   // Morning brief card
   const brief=await api('/api/morning');
   let briefCard='';
   if(brief&&brief.brief){
     const bHtml=brief.brief.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--amber)">$1</strong>').replace(/\*(.*?)\*/g,'<em style="color:var(--muted)">$1</em>').replace(/^##.*$/gm,'').split('\n').filter(l=>l.trim()).join('<br>');
-    briefCard=`<div class="insight-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:var(--amber);font-size:11px;font-weight:500">🌅 Morning Brief</span>${brief.streak>0?`<span style="color:var(--coral);font-size:10px">🔥 ${brief.streak}d streak</span>`:''}</div><div style="color:var(--text-dim);font-family:var(--sans);font-size:12px;line-height:1.7">${bHtml}</div></div>`;
+    briefCard=`<div class="insight-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:var(--amber);font-size:11px;font-weight:500">Morning Brief</span>${brief.streak>0?`<span style="color:var(--coral);font-size:10px">${brief.streak}d streak</span>`:''}</div><div style="color:var(--text-dim);font-family:var(--sans);font-size:12px;line-height:1.7">${bHtml}</div></div>`;
   }
 
   // Oracle card
@@ -710,7 +740,7 @@ async function loadToday(){
       const tc={'inbox_loop_match':'var(--amber)','task_loop_block':'var(--coral)','belief_conflict':'var(--amber)','stale_project':'var(--blue)','person_missing':'var(--green)','loop_aging':'var(--coral)','orphan_task':'var(--muted)'}[ins.type]||'var(--muted)';
       return`<div class="oracle-item"><div class="oracle-type" style="color:${tc}">${ins.type}</div><div class="oracle-detail">${ins.detail.substring(0,90)}</div><div class="oracle-action">-- ${ins.action.substring(0,65)}</div></div>`;
     }).join('');
-    oCard=`<div class="oracle-card" id="oracle-card"><div class="oracle-card-head"><span class="oracle-card-title">🔮 Oracle -- ${od.count} insight${od.count!==1?'s':''}</span><button class="btn" style="font-size:9px;padding:4px 10px" onclick="goTo('oracle')">All</button></div>${oItems}</div>`;
+    oCard=`<div class="oracle-card" id="oracle-card"><div class="oracle-card-head"><span class="oracle-card-title">Oracle -- ${od.count} insight${od.count!==1?'s':''}</span><button class="btn" style="font-size:9px;padding:4px 10px" onclick="goTo('oracle')">All</button></div>${oItems}</div>`;
   }
 
   // Urgent items
@@ -812,14 +842,13 @@ async function loadReview(){
 async function loadTimeline(){
   const d=await api('/api/sheet/ledger');
   const rows=(d.rows||[]).filter(r=>r['Status']==='written').slice(-50).reverse();
-  const em={'🚀 Projects':'🚀','✅ Tasks':'✅','🔓 Open Loops':'🔓','👤 Identity':'👤','🎯 Goals':'🎯','👥 People':'👥','📥 Inbox':'📥','🧠 Beliefs':'🧠','💡 Preferences':'💡'};
-  if(!rows.length){document.getElementById('timeline').innerHTML='<div class="sh"><span>Timeline</span></div><div class="empty">No activity yet.</div>';return;}
+    if(!rows.length){document.getElementById('timeline').innerHTML='<div class="sh"><span>Timeline</span></div><div class="empty">No activity yet.</div>';return;}
   let html='<div class="sh"><span>Activity Timeline</span></div><div class="tl">';
   rows.forEach(r=>{
-    const sh=r['Sheet']||'';const ico=em[sh]||'📝';
+    const sh=r['Sheet']||'';
     const ts=(r['Timestamp']||'').substring(0,16).replace('T',' ');
     const rid=r['Row Identifier']||'';
-    html+=`<div class="tli"><div class="tl-ts">${ts}</div><div class="tl-body"><div class="tl-ag">${r['Agent']||'?'} -- ${r['Operation']||'?'}</div><div>${ico} ${sh.replace(/^[^\s]+\s*/,'').substring(0,40)}${rid?' -- '+rid.substring(0,40):''}</div></div></div>`;
+    html+=`<div class="tli"><div class="tl-ts">${ts}</div><div class="tl-body"><div class="tl-ag">${r['Agent']||'?'} -- ${r['Operation']||'?'}</div><div>${sh.replace(/^[^\s]+\s*/,'').substring(0,40)}${rid?' -- '+rid.substring(0,40):''}</div></div></div>`;
   });
   html+='</div>';
   document.getElementById('timeline').innerHTML=html;
@@ -1233,7 +1262,7 @@ async function loadConfigSettings() {
   const pane = document.getElementById('config_settings');
   if (pane) {
     pane.innerHTML = `
-      <div class="sh"><span>⚙️ System Configuration & Settings</span></div>
+      <div class="sh"><span>System Configuration & Settings</span></div>
       <div style="max-width:600px;background:var(--surface2);border:1px solid var(--border);padding:20px;margin-bottom:20px;">
         <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:15px;">Interface Customization</div>
         
@@ -1251,7 +1280,7 @@ async function loadConfigSettings() {
       </div>
 
       <div style="max-width:600px;background:var(--surface2);border:1px solid var(--border);padding:20px;margin-bottom:20px;">
-        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--purple);margin-bottom:15px;">🧠 Cognitive Memory & Embeddings</div>
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--indigo);margin-bottom:15px;">Cognitive Memory & Embeddings</div>
         <div style="margin-bottom:15px;">
           <label style="display:block;font-size:9px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">Dense Embeddings Model (VidyaKosha)</label>
           <select id="cfg-embedder" style="width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:8px;font-family:var(--mono);font-size:11px;outline:none;">
@@ -1325,12 +1354,12 @@ async function loadConfigSettings() {
       </div>
 
       <div style="max-width:600px;background:var(--surface2);border:1px solid var(--border);padding:20px;margin-bottom:20px;">
-        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:15px;">🔒 Security & Passkeys</div>
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:15px;">Security & Passkeys</div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:15px;line-height:1.5;">
           Protect your AI memory database with Apple, Google, or hardware passkeys. Once registered, OpenYantra will require verification to load.
         </p>
         <div id="passkeys-list" style="margin-bottom:15px;"></div>
-        <button class="btn-p" onclick="registerPasskey()" style="font-size:10px;padding:6px 12px;font-family:var(--mono);">➕ Register New Passkey</button>
+        <button class="btn-p" onclick="registerPasskey()" style="font-size:10px;padding:6px 12px;font-family:var(--mono);">Register New Passkey</button>
       </div>
 
       <div style="max-width:600px;display:flex;gap:10px;margin-bottom:30px;">
@@ -1339,7 +1368,7 @@ async function loadConfigSettings() {
       </div>
 
       <div style="max-width:600px;background:var(--surface2);border:1px solid var(--border);padding:20px;margin-bottom:20px;">
-        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:15px;">🔌 Local MCP Server Connection</div>
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:15px;">Local MCP Server Connection</div>
         <p style="font-size:11px;color:var(--muted);margin-bottom:15px;line-height:1.5;">
           Connect your OpenYantra system locally to any AI client or IDE that supports the Model Context Protocol (MCP).
         </p>
@@ -1361,7 +1390,7 @@ async function loadConfigSettings() {
         <div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Connection Command / Configuration Block</div>
         <pre id="mcp-code-block" style="background:var(--surface);padding:12px;font-family:var(--mono);font-size:10px;color:var(--text);border:1px solid var(--border2);overflow-x:auto;margin-bottom:12px;max-height:250px;line-height:1.4;white-space:pre-wrap;word-break:break-all;"></pre>
 
-        <button class="btn-p" style="font-size:10px;padding:6px 12px;" onclick="copyMcpConfig()">📋 Copy Configuration</button>
+        <button class="btn-p" style="font-size:10px;padding:6px 12px;" onclick="copyMcpConfig()">Copy Configuration</button>
       </div>
     `;
 
@@ -1387,7 +1416,7 @@ async function loadConfigSettings() {
           return `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:10px;">
               <div style="flex:1;">
-                <div style="font-weight:500;color:var(--text);font-size:11px;font-family:var(--mono);">🔑 ${escLabel}</div>
+                <div style="font-weight:500;color:var(--text);font-size:11px;font-family:var(--mono);">${escLabel}</div>
                 <div style="font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--mono);">Added: ${added} · Count: ${pk.sign_count || 0}</div>
               </div>
               <button class="btn btn-x" style="padding:4px 8px;font-size:9px;font-family:var(--mono);" onclick="deletePasskey('${pk.credential_id}')">Delete</button>
@@ -2046,14 +2075,14 @@ async function loadCognitiveGraph() {
   const container = document.getElementById('cognitive_graph');
   
   container.innerHTML = `
-    <div class="sh"><span>🕸️ Sutradhar Relationship Graph</span></div>
-    <p style="font-family:var(--sans); font-size:12px; color:var(--text-dim); margin-bottom:12px;">Force-directed graph of your memory relationships. <strong style="color:#1c6fff;">●</strong> Agents &nbsp; <strong style="color:#e84520;">●</strong> Memories &nbsp; <strong style="color:#f5a000;">●</strong> Tags &nbsp; <strong style="color:#00c9a7;">●</strong> Projects &nbsp; <strong style="color:#a855f7;">●</strong> Tasks &nbsp; <strong style="color:#ec4899;">●</strong> People &nbsp; <strong style="color:#64748b;">●</strong> Other entities. Drag nodes to interact.</p>
+    <div class="sh"><span>Sutradhar Relationship Graph</span></div>
+    <p style="font-family:var(--sans); font-size:12px; color:var(--text-dim); margin-bottom:12px;">Force-directed graph of your memory relationships. <strong style="color:var(--indigo);">&#9679;</strong> Agents &nbsp; <strong style="color:var(--coral);">&#9679;</strong> Memories and people &nbsp; <strong style="color:var(--amber);">&#9679;</strong> Tags and loops &nbsp; <strong style="color:var(--blue);">&#9679;</strong> Projects &nbsp; <strong style="color:var(--green);">&#9679;</strong> Tasks and goals &nbsp; <strong style="color:var(--subtle);">&#9679;</strong> Other entities. Drag nodes to interact.</p>
     <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap: wrap;">
       <button onclick="addEdgePrompt()" style="background:var(--surface2); border:1px solid var(--border2); color:var(--text); padding:6px 14px; font-family:var(--mono); font-size:10px; cursor:pointer; letter-spacing:0.05em;">+ Add Edge</button>
       <button onclick="loadCognitiveGraph()" style="background:var(--surface2); border:1px solid var(--border2); color:var(--text); padding:6px 14px; font-family:var(--mono); font-size:10px; cursor:pointer; letter-spacing:0.05em;">↻ Refresh</button>
       <span id="graphEdgeCount" style="font-family:var(--mono); font-size:10px; color:var(--muted); align-self:center;"></span>
     </div>
-    <div style="background:var(--surface); border:1px solid var(--border); width:100%; height:550px; position:relative; overflow:hidden; border-radius:4px;">
+    <div style="background:var(--surface); border:1px solid var(--border); width:100%; height:550px; position:relative; overflow:hidden;">
       <canvas id="graphCanvas" style="display:block; width:100%; height:100%;"></canvas>
     </div>
   `;
@@ -2088,16 +2117,16 @@ async function loadCognitiveGraph() {
 
 function getNodeColor(type) {
   const colors = {
-    agent: '#1c6fff',
+    agent: '#5535e0',
     doc: '#e84520',
     tag: '#f5a000',
-    projects: '#00c9a7',
-    tasks: '#a855f7',
-    people: '#ec4899',
-    open_loops: '#f97316',
-    goals: '#eab308',
+    projects: '#1c6fff',
+    tasks: '#1aa167',
+    people: '#e84520',
+    open_loops: '#f5a000',
+    goals: '#1aa167',
   };
-  return colors[type] || '#64748b';
+  return colors[type] || '#7a7682';
 }
 
 function getNodeRadius(type) {
@@ -2388,7 +2417,7 @@ async function loadContextCompile() {
   if (!pane) return;
   
   pane.innerHTML = `
-    <div class="sh"><span>📖 Context Pruning Engine (Sutra)</span></div>
+    <div class="sh"><span>Context Pruning Engine (Sutra)</span></div>
     
     <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
       <!-- Left panel: configuration inputs -->
@@ -2420,31 +2449,31 @@ async function loadContextCompile() {
           <label style="display: block; font-size: 9px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase;">Active Sections</label>
           <div id="ctxSections" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="identity" onchange="previewContext()" /> 👤 Identity
+              <input type="checkbox" value="identity" onchange="previewContext()" /> Identity
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="instructions" onchange="previewContext()" /> 📋 Instructions
+              <input type="checkbox" value="instructions" onchange="previewContext()" /> Instructions
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="goals" onchange="previewContext()" /> 🎯 Goals
+              <input type="checkbox" value="goals" onchange="previewContext()" /> Goals
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="projects" onchange="previewContext()" /> 🚀 Projects
+              <input type="checkbox" value="projects" onchange="previewContext()" /> Projects
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="loops" onchange="previewContext()" /> 🔓 Loops
+              <input type="checkbox" value="loops" onchange="previewContext()" /> Loops
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="tasks" onchange="previewContext()" /> ✅ Tasks
+              <input type="checkbox" value="tasks" onchange="previewContext()" /> Tasks
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="preferences" onchange="previewContext()" /> 💡 Preferences
+              <input type="checkbox" value="preferences" onchange="previewContext()" /> Preferences
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="beliefs" onchange="previewContext()" /> 🧠 Beliefs
+              <input type="checkbox" value="beliefs" onchange="previewContext()" /> Beliefs
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-size: 11px; cursor: pointer; color: var(--text);">
-              <input type="checkbox" value="people" onchange="previewContext()" /> 👥 People
+              <input type="checkbox" value="people" onchange="previewContext()" /> People
             </label>
           </div>
         </div>
@@ -2460,22 +2489,22 @@ async function loadContextCompile() {
               <span>Token Utilization</span>
               <span id="ctxUtilizationLabel">0 / 4096 (0%)</span>
             </div>
-            <div style="display: flex; background: var(--surface3); border: 1px solid var(--border); height: 24px; width: 100%; border-radius: 2px; overflow: hidden; position: relative; align-items: stretch;">
+            <div style="display: flex; background: var(--surface3); border: 1px solid var(--border); height: 24px; width: 100%; overflow: hidden; position: relative; align-items: stretch;">
               <div id="pb-static" style="background: var(--amber); width: 0%; transition: width 0.3s;" title="Static context (Identity, Instructions)"></div>
               <div id="pb-dynamic" style="background: var(--blue); width: 0%; transition: width 0.3s;" title="Dynamic context (Projects, Goals, etc)"></div>
               <div id="pb-text" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text); text-shadow: 0 1px 2px rgba(0,0,0,0.8); pointer-events: none;">0% used</div>
             </div>
             <div style="display: flex; gap: 12px; margin-top: 6px; font-size: 9px; color: var(--muted); flex-wrap: wrap;">
               <div style="display: flex; align-items: center; gap: 4px;">
-                <div style="width: 8px; height: 8px; background: var(--amber); border-radius: 1px;"></div>
+                <div style="width: 8px; height: 8px; background: var(--amber); "></div>
                 <span>Static: <span id="ctxStaticTokens">0</span> t</span>
               </div>
               <div style="display: flex; align-items: center; gap: 4px;">
-                <div style="width: 8px; height: 8px; background: var(--blue); border-radius: 1px;"></div>
+                <div style="width: 8px; height: 8px; background: var(--blue); "></div>
                 <span>Dynamic: <span id="ctxDynamicTokens">0</span> t</span>
               </div>
               <div style="display: flex; align-items: center; gap: 4px;">
-                <div style="width: 8px; height: 8px; background: var(--surface3); border: 1px solid var(--border); border-radius: 1px;"></div>
+                <div style="width: 8px; height: 8px; background: var(--surface3); border: 1px solid var(--border); "></div>
                 <span>Remaining: <span id="ctxRemainingTokens">4096</span> t</span>
               </div>
             </div>
@@ -2495,10 +2524,10 @@ async function loadContextCompile() {
         
         <div style="display: flex; gap: 10px; margin-top: 20px;">
           <button class="btn-p" onclick="compileAndCopyCtx()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 10px;">
-            📋 Compile & Copy
+            Compile & Copy
           </button>
           <button class="btn" onclick="previewContext()" style="padding: 8px 16px; font-size: 10px;">
-            🔄 Refresh
+            Refresh
           </button>
         </div>
       </div>
@@ -2506,9 +2535,9 @@ async function loadContextCompile() {
 
     <!-- Tabs for Preview / Packed / Discarded -->
     <div style="margin-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; gap: 4px;">
-      <button class="th-btn active" id="btn-tab-preview" onclick="switchSubTab('preview')">👁️ Preview Markdown</button>
-      <button class="th-btn" id="btn-tab-packed" onclick="switchSubTab('packed')">📦 Packed Items (<span id="tab-packed-cnt">0</span>)</button>
-      <button class="th-btn" id="btn-tab-discarded" onclick="switchSubTab('discarded')">🗑️ Pruned Items (<span id="tab-discarded-cnt">0</span>)</button>
+      <button class="th-btn active" id="btn-tab-preview" onclick="switchSubTab('preview')">Preview Markdown</button>
+      <button class="th-btn" id="btn-tab-packed" onclick="switchSubTab('packed')">Packed Items (<span id="tab-packed-cnt">0</span>)</button>
+      <button class="th-btn" id="btn-tab-discarded" onclick="switchSubTab('discarded')">Pruned Items (<span id="tab-discarded-cnt">0</span>)</button>
     </div>
 
     <div id="subtab-preview" class="subtab-content" style="display: block;">
@@ -2715,7 +2744,8 @@ async function compileAndCopyCtx() {
 }
 
 /* Auto refresh Today */
-setInterval(()=>{if(cur==='today')loadToday();},30000);
+setInterval(()=>{if(cur==='today')loadToday();refreshNavCounts();},30000);
+refreshNavCounts();
 
 async function initApp() {
   try {
