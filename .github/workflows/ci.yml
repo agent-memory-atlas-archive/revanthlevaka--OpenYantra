@@ -51,6 +51,7 @@ jobs:
     env:
       TOKENIZERS_PARALLELISM: "false"
       OMP_NUM_THREADS: "1"
+      PYTHONUTF8: "1"
 
     steps:
       - name: Check out repository
@@ -81,7 +82,6 @@ jobs:
   package-build:
     name: Build & Validate Distribution Packages
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Check out repository
         uses: actions/checkout@v7

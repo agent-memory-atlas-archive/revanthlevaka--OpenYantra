@@ -25,7 +25,7 @@ def test_setup_mcp_config_creates_new():
         server = data["mcpServers"]["openyantra"]
         assert server["command"] == "/mock/bin/python"
         assert "--file" in server["args"]
-        assert "/mock/chitrapat.ods" in server["args"]
+        assert str(Path("/mock/chitrapat.ods").resolve()) in server["args"]
 
 def test_setup_mcp_config_preserves_existing():
     with tempfile.TemporaryDirectory() as tmpdir:

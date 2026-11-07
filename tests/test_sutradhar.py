@@ -7,7 +7,7 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from yantra_sqlite import SyncEngine
+from openyantra.yantra_sqlite import SyncEngine
 
 
 @pytest.fixture

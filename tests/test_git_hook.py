@@ -44,7 +44,8 @@ def test_install_git_hook(temp_git_repo):
     assert res["status"] == "success"
     hook_file = temp_git_repo / ".git" / "hooks" / "post-commit"
     assert hook_file.exists()
-    assert os.access(hook_file, os.X_OK)
+    if os.name != "nt":
+        assert os.access(hook_file, os.X_OK)
 
 
 def test_ingest_last_commit(temp_git_repo, mock_oy):

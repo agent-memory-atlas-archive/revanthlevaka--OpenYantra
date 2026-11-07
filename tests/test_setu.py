@@ -13,7 +13,7 @@ from openyantra.yantra_context import run_context, build_context_markdown
 def temp_dir():
     d = tempfile.mkdtemp()
     yield Path(d)
-    shutil.rmtree(d)
+    shutil.rmtree(d, ignore_errors=True)
 
 @pytest.fixture
 def sync_engine(temp_dir):

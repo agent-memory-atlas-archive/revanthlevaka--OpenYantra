@@ -14,7 +14,7 @@ def temp_db():
     store = CognitiveMemoryStore(file_path=db_path)
     yield store
     # Cleanup
-    shutil.rmtree(temp_dir)
+    shutil.rmtree(temp_dir, ignore_errors=True)
 
 def test_write_and_read_memory(temp_db):
     # Test basic write and read

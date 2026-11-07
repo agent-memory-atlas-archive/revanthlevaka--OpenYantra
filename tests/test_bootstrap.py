@@ -12,7 +12,7 @@ def temp_ods_path():
     temp_dir = tempfile.mkdtemp()
     ods_path = os.path.join(temp_dir, "chitrapat.ods")
     yield ods_path
-    shutil.rmtree(temp_dir)
+    shutil.rmtree(temp_dir, ignore_errors=True)
 
 def test_bootstrap_first_time(temp_ods_path):
     # Mock inputs for the bootstrap interview (all 12 questions/steps)
