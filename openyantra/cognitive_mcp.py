@@ -334,7 +334,13 @@ def handle_call_tool(req_id, params, store=None):
             content = arguments.get("content")
             tags = arguments.get("tags")
             
-            res = active_db.write(key, type_val, agent, content, tags)
+            # Redact secrets through Raksha guard before saving
+            from openyantra.yantra_security import Raksha
+            _raksha = Raksha()
+            redacted_content, _ = _raksha.redact_secrets(str(content or ""))
+            redacted_key, _ = _raksha.redact_secrets(str(key or ""))
+
+            res = active_db.write(redacted_key, type_val, agent, redacted_content, tags)
             return make_text_response(req_id, json.dumps(res, indent=2))
 
         elif name == "memory_read":
@@ -396,26 +402,17 @@ def handle_call_tool(req_id, params, store=None):
             if not oy:
                 return make_error_response(req_id, "OpenYantra sheet engine not initialized.")
             content = arguments.get("content")
-            source = arguments.get("source", "MCP-agent")
-            req = WriteRequest(
-                requesting_agent=source,
-                sheet=SHEET_MAP["inbox"],
-                operation="add",
-                fields={"Item": content, "Status": "Pending", "Source": source},
-                confidence="High",
-                source="MCP tool call"
-            )
-            success = oy.request_write(req)
+            success = oy.inbox(text=content, source="Agent-observed", importance=5)
             return make_text_response(req_id, json.dumps({"success": success, "item": content}, indent=2))
 
         elif name == "add_open_loop":
             if not oy:
                 return make_error_response(req_id, "OpenYantra sheet engine not initialized.")
             topic = arguments.get("topic")
-            context = arguments.get("context")
+            context = arguments.get("context", "")
             priority = arguments.get("priority", "Medium")
             importance = arguments.get("importance", 5)
-            success = oy.add_open_loop(topic, context, priority, importance)
+            success = oy.add_open_loop(topic=topic, context=context, priority=priority, importance=importance)
             return make_text_response(req_id, json.dumps({"success": success, "topic": topic}, indent=2))
 
         elif name == "resolve_open_loop":
@@ -447,7 +444,7 @@ def handle_call_tool(req_id, params, store=None):
                 fields={"Status": "Done"},
                 row_identifier=task,
                 confidence="High",
-                source="MCP tool call"
+                source="Agent-observed"
             )
             success = oy.request_write(req)
             return make_text_response(req_id, json.dumps({"success": success, "task": task}, indent=2))
@@ -459,7 +456,8 @@ def handle_call_tool(req_id, params, store=None):
             domain = arguments.get("domain", "")
             status = arguments.get("status", "Active")
             next_step = arguments.get("next_step", "")
-            success = oy.add_project(project, domain, status, next_step)
+            priority = arguments.get("priority", "High")
+            success = oy.add_project(project=project, domain=domain, status=status, priority=priority, next_step=next_step)
             return make_text_response(req_id, json.dumps({"success": success, "project": project}, indent=2))
 
         elif name == "graph_traverse":

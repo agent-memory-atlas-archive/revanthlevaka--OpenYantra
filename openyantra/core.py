@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import logging as _logging
 import json
+import re
 import threading
 import time
 from datetime import date, datetime, timedelta
@@ -121,10 +122,10 @@ def _is_worth_remembering(fields: dict, sheet: str) -> tuple[bool, str]:
     if sheet in (SHEET_SESSION_LOG, SHEET_LEDGER, SHEET_INBOX):
         return True, "always admit"
 
-    # Check for noise patterns
+    # Check for noise patterns (word-boundary matched to avoid false positives like 'ensure' matching 'sure')
     text = " ".join(str(v).lower() for v in fields.values() if v)
     for pattern in NOISE_PATTERNS:
-        if pattern in text:
+        if re.search(r'\b' + re.escape(pattern) + r'\b', text):
             return False, f"noise pattern: '{pattern}'"
 
     # Require minimum content
@@ -231,6 +232,14 @@ class WriteQueue:
             items = self._load(); self._save([])
             return [WriteRequest.from_dict(d) for d in items]
 
+    def acknowledge(self, request_id: str):
+        """Remove a committed/processed write from the queue to prevent double replay."""
+        with self._lock:
+            items = self._load()
+            remaining = [d for d in items if d.get("request_id") != request_id]
+            if len(remaining) != len(items):
+                self._save(remaining)
+
     def peek(self) -> list[dict]: return self._load()
     def is_empty(self) -> bool: return len(self._load()) == 0
 
@@ -254,9 +263,12 @@ class LedgerAgent:
         self._dead_switch_mins = dead_switch_minutes
 
     def submit(self, req: WriteRequest) -> dict:
-        """Submit a Karma-Lekha. Enqueue first for crash safety."""
+        """Submit a Karma-Lekha. Enqueue first for crash safety, acknowledge on completion."""
         self.queue.enqueue(req)
-        return self._process(req)
+        try:
+            return self._process(req)
+        finally:
+            self.queue.acknowledge(req.request_id)
 
     def replay_queue(self) -> int:
         pending = self.queue.dequeue_all()
@@ -601,6 +613,11 @@ class OpenYantra:
             confidence = "High", source = source, importance = importance,
         ))
 
+    def add_inbox_item(self, text: str, source: str = "User-stated",
+                       importance: int = 5) -> dict:
+        """Alias for inbox."""
+        return self.inbox(text=text, source=source, importance=importance)
+
     def route_inbox(self, dry_run: bool = False) -> list[dict]:
         """
         Route unprocessed Inbox rows to their correct sheets.
@@ -632,7 +649,7 @@ class OpenYantra:
                 self.request_write(WriteRequest(
                     "Chitragupta", SHEET_INBOX, "update",
                     {"Routed?": "Yes", "Target Sheet": target or "Unknown"},
-                    row_identifier = str(row.get("Content", ""))[:50],
+                    row_identifier = str(row.get("Content", "")),
                     confidence = "High", source = "System", importance = 5,
                 ))
                 decision["routed"] = True
@@ -797,6 +814,22 @@ class OpenYantra:
             confidence="High", source="Agent-observed", importance=importance,
         ))
 
+    def open_loop(self, topic: str, context: str = "",
+                  priority: str = "Medium", related_project: str = "",
+                  ttl_days: int = 90, importance: int = 7) -> dict:
+        """Convenience alias for flush_open_loop."""
+        return self.flush_open_loop(topic=topic, context=context, priority=priority,
+                                   related_project=related_project, ttl_days=ttl_days,
+                                   importance=importance)
+
+    def add_open_loop(self, topic: str, context: str = "",
+                      priority: str = "Medium", related_project: str = "",
+                      ttl_days: int = 90, importance: int = 7) -> dict:
+        """Convenience alias for flush_open_loop."""
+        return self.flush_open_loop(topic=topic, context=context, priority=priority,
+                                   related_project=related_project, ttl_days=ttl_days,
+                                   importance=importance)
+
     def resolve_open_loop(self, topic: str, resolution: str = "") -> dict:
         return self.request_write(WriteRequest(
             self.agent_name, SHEET_OPEN_LOOPS, "resolve",
@@ -906,6 +939,8 @@ class OpenYantra:
             "people": SHEET_PEOPLE,
             "preferences": SHEET_PREFERENCES,
             "beliefs": SHEET_BELIEFS,
+            "beliefs & principles": SHEET_BELIEFS,
+            "beliefs_&_principles": SHEET_BELIEFS,
             "tasks": SHEET_TASKS,
             "open_loops": SHEET_OPEN_LOOPS,
             "open loops": SHEET_OPEN_LOOPS,

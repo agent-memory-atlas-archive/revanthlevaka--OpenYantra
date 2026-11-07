@@ -94,3 +94,8 @@ def test_nidra_full_consolidation_heuristic(mock_oy):
     assert result["provider_used"] == "heuristic"
     assert result["sessions_clustered"] >= 1
     assert len(result["summary"]) > 0
+    assert len(result["promoted_preferences"]) >= 1
+    
+    # Verify the belief actually landed in the sheet
+    beliefs = mock_oy.get_sheet("beliefs")
+    assert any("clean code" in str(b.get("Position", "")).lower() for b in beliefs)

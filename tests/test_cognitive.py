@@ -201,3 +201,99 @@ def test_search_memories_date_filtering(temp_db):
     res = temp_db.search(start_date="2026-05-25")
     assert len(res) == 0
 
+
+def test_mcp_memory_write_redacts_secrets(temp_db):
+    secret_key = "sk-ant-api03-abcdef1234567890abcdef1234567890abcdef12345678"
+    resp = handle_call_tool(10, {
+        "name": "memory_write",
+        "arguments": {
+            "key": "secret-note",
+            "type": "fact",
+            "agent": "System",
+            "content": f"Use key {secret_key} for testing",
+            "tags": ["auth"]
+        }
+    }, store=temp_db)
+    assert "error" not in resp
+    mem = temp_db.read("secret-note")
+    assert secret_key not in mem["content"]
+    assert "[REDACTED_API_KEY:anthropic:" in mem["content"]
+
+
+def test_mcp_sheet_write_tools(tmp_path):
+    from openyantra.core import OpenYantra
+    import cognitive_mcp
+
+    oy_file = tmp_path / "chitrapat.ods"
+    oy = OpenYantra(oy_file)
+    oy.bootstrap(user_name="MCP Tester", occupation="Bot")
+
+    old_oy = cognitive_mcp.oy
+    cognitive_mcp.oy = oy
+
+    try:
+        # 1. add_inbox_item
+        resp = handle_call_tool(11, {
+            "name": "add_inbox_item",
+            "arguments": {"content": "Buy new server rack"}
+        })
+        assert "error" not in resp
+        data = json.loads(resp["result"]["content"][0]["text"])
+        assert data["success"]["status"] == "written"
+        inbox = oy.get_sheet("inbox")
+        assert any(r.get("Content") == "Buy new server rack" for r in inbox)
+
+        # 2. add_open_loop
+        resp = handle_call_tool(12, {
+            "name": "add_open_loop",
+            "arguments": {"topic": "Review latency benchmarks", "context": "P99 is high", "priority": "High"}
+        })
+        assert "error" not in resp
+        data = json.loads(resp["result"]["content"][0]["text"])
+        assert data["success"]["status"] == "written"
+        loops = oy.get_sheet("open_loops")
+        assert any(l.get("Topic") == "Review latency benchmarks" for l in loops)
+
+        # 3. resolve_open_loop
+        resp = handle_call_tool(13, {
+            "name": "resolve_open_loop",
+            "arguments": {"topic": "Review latency benchmarks", "resolution": "Added cache"}
+        })
+        assert "error" not in resp
+        loops = oy.get_sheet("open_loops")
+        target = next((l for l in loops if l.get("Topic") == "Review latency benchmarks"), None)
+        assert target is not None
+        assert str(target.get("Resolved?", "")).lower() == "yes"
+
+        # 4. add_task
+        resp = handle_call_tool(14, {
+            "name": "add_task",
+            "arguments": {"task": "Write OpenAPI spec", "priority": "High"}
+        })
+        assert "error" not in resp
+        tasks = oy.get_sheet("tasks")
+        assert any(t.get("Task") == "Write OpenAPI spec" for t in tasks)
+
+        # 5. complete_task
+        resp = handle_call_tool(15, {
+            "name": "complete_task",
+            "arguments": {"task": "Write OpenAPI spec"}
+        })
+        assert "error" not in resp
+        tasks = oy.get_sheet("tasks")
+        target_task = next((t for t in tasks if t.get("Task") == "Write OpenAPI spec"), None)
+        assert target_task is not None
+        assert target_task.get("Status") == "Done"
+
+        # 6. add_project
+        resp = handle_call_tool(16, {
+            "name": "add_project",
+            "arguments": {"project": "Titan V2", "domain": "Infra", "status": "Active", "next_step": "Deploy"}
+        })
+        assert "error" not in resp
+        projects = oy.get_sheet("projects")
+        assert any(p.get("Project") == "Titan V2" for p in projects)
+
+    finally:
+        cognitive_mcp.oy = old_oy
+

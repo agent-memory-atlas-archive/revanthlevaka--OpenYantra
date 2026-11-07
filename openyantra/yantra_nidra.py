@@ -106,10 +106,11 @@ class NidraConsolidator:
         Scans recent session logs and inbox notes for recurring user preferences or principles
         that should be promoted into the Beliefs & Principles sheet.
         """
-        existing_beliefs = self.oy.get_sheet("Beliefs & Principles")
+        from openyantra.core import SHEET_BELIEFS
+        existing_beliefs = self.oy.get_sheet(SHEET_BELIEFS)
         known_statements = {
-            str(b.get("Belief / Principle", "")).strip().lower()
-            for b in existing_beliefs if b.get("Belief / Principle")
+            str(b.get("Position") or b.get("Belief / Principle") or "").strip().lower()
+            for b in existing_beliefs if (b.get("Position") or b.get("Belief / Principle"))
         }
 
         sessions = self.oy.get_sheet("Session Log")
@@ -221,21 +222,26 @@ class NidraConsolidator:
         promoted_applied = []
         if not dry_run and promoted:
             for p in promoted:
-                from openyantra.core import WriteRequest
+                from openyantra.core import WriteRequest, SHEET_BELIEFS
+                belief_text = p.get("Belief / Principle") or p.get("Position") or ""
                 req = WriteRequest(
                     requesting_agent="NidraConsolidator",
-                    sheet="Beliefs & Principles",
+                    sheet=SHEET_BELIEFS,
                     operation="add",
                     fields={
-                        "Belief / Principle": p["Belief / Principle"],
-                        "Domain": p["Domain"],
-                        "Category": "Preference",
-                        "Confidence": p["Confidence"],
-                        "Source": p["Source"],
-                        "Last Validated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                        "Contradicted By": "",
-                        "Notes": "Auto-promoted during cognitive sleep consolidation"
-                    }
+                        "Topic": p.get("Domain", "Operational"),
+                        "Position": belief_text,
+                        "Confidence": p.get("Confidence", "High"),
+                        "Domain": p.get("Domain", "Operational"),
+                        "Last Updated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                        "Notes": "Auto-promoted during cognitive sleep consolidation",
+                        "Source": "Agent-inferred",
+                        "Importance": 8,
+                        "Contradiction_Flag": "No"
+                    },
+                    confidence="High",
+                    source="Agent-inferred",
+                    importance=8
                 )
                 res = self.oy.request_write(req)
                 if res.get("status") in ("written", "committed", "queued"):
