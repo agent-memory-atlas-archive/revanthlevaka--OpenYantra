@@ -58,10 +58,11 @@ def test_ui_nidra_consolidate(mock_oy):
     assert "summary" in data
 
 
-def test_ui_vault_sync(mock_oy, tmp_path):
+def test_ui_vault_sync(mock_oy, tmp_path, monkeypatch):
     vault_dir = tmp_path / "ui_vault"
+    monkeypatch.setenv("OPENYANTRA_VAULT_DIR", str(vault_dir))
     client = TestClient(app)
-    res = client.post("/api/vault/sync", json={"path": str(vault_dir)})
+    res = client.post("/api/vault/sync", json={"path": "/etc"})  # request path is ignored
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
