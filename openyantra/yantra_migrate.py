@@ -30,11 +30,7 @@ except ImportError:
     print("pandas required: pip install pandas odfpy"); sys.exit(1)
 
 try:
-    from openyantra import (
-        OpenYantra, _build_ods_template,
-        SHEET_INBOX, SHEET_CORRECTIONS, SHEET_QUARANTINE,
-        SHEET_SECURITY_LOG, ALL_SHEETS
-    )
+    pass
     from openyantra.yantra_sqlite import validate_ods_headers
 except ImportError:
     print("openyantra.py not found."); sys.exit(1)

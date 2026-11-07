@@ -53,17 +53,11 @@ except ImportError:
 
 # Raksha security engine -- graceful fallback
 try:
-    from openyantra.yantra_security import (
-        Raksha, ScanResult, ThreatLevel, TrustTier,
-        get_raksha, run_security_audit
-    )
+    from openyantra.yantra_security import Raksha, TrustTier, get_raksha
     _RAKSHA_AVAILABLE = True
 except ImportError:
     try:
-        from yantra_security import (
-            Raksha, ScanResult, ThreatLevel, TrustTier,
-            get_raksha, run_security_audit
-        )
+        from yantra_security import Raksha, TrustTier, get_raksha
         _RAKSHA_AVAILABLE = True
     except ImportError:
         _RAKSHA_AVAILABLE = False
