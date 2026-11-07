@@ -22,6 +22,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -227,7 +229,7 @@ def copy_to_clipboard(text: str) -> bool:
             proc = subprocess.run(["clip"], input=text.encode(), check=True)
             return proc.returncode == 0
     except Exception:
-        pass
+        _oy_log.debug("ignored error", exc_info=True)
     return False
 
 

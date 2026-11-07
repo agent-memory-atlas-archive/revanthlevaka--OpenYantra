@@ -34,6 +34,8 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Optional
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 # ── Threat levels ─────────────────────────────────────────────────────────────
 
@@ -386,7 +388,7 @@ class Raksha:
                                     "preview":       row_text[:100],
                                 })
                     except Exception:
-                        pass
+                        _oy_log.debug("ignored error", exc_info=True)
 
             # Check Agrasandhanī for tampered signatures
             try:
@@ -404,7 +406,7 @@ class Raksha:
                             "preview":      f"Row {row.get('Request ID','?')} -- bad signature",
                         })
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
 
         except Exception:
             import logging
@@ -447,7 +449,7 @@ class Raksha:
                                         f"from mean -- possible poisoned vector",
                     })
         except ImportError:
-            pass  # numpy not available
+            _oy_log.debug("ignored error", exc_info=True)  # numpy not available
         return findings
 
     # ── Internal ───────────────────────────────────────────────────────────────
@@ -638,7 +640,7 @@ def _count_rows(oy_path: str) -> int:
                     df = xl.parse(sheet, header=0)
                     total += len(df)
                 except Exception:
-                    pass
+                    _oy_log.debug("ignored error", exc_info=True)
         return total
     except Exception:
         return 0

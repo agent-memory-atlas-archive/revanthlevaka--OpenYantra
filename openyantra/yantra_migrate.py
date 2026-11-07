@@ -19,6 +19,8 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -276,7 +278,7 @@ def _execute_step(path: str, step: dict):
             try:
                 _add_column(path, sheet, "Importance", step.get("default", "5"))
             except Exception:
-                pass  # Sheet may not exist in older versions
+                _oy_log.debug("ignored error", exc_info=True)  # Sheet may not exist in older versions
 
     elif action == "add_sheet":
         _add_sheet(path, step["sheet"], step.get("columns", []))
@@ -313,7 +315,7 @@ def _add_sheet(path: str, sheet_name: str, columns: list[str]):
                 except Exception:
                     existing[name] = pd.DataFrame()
     except Exception:
-        pass
+        _oy_log.debug("ignored error", exc_info=True)
 
     # Add new empty sheet
     new_df = pd.DataFrame(columns=columns)
@@ -336,7 +338,7 @@ def _write_sheet(path: str, sheet_name: str, df: pd.DataFrame):
                     except Exception:
                         existing[name] = pd.DataFrame()
     except Exception:
-        pass
+        _oy_log.debug("ignored error", exc_info=True)
 
     with pd.ExcelWriter(path, engine="odf") as writer:
         for name, edf in existing.items():

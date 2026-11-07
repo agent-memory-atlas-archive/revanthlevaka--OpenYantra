@@ -40,6 +40,8 @@ from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 try:
     import portalocker
@@ -610,7 +612,7 @@ class SyncEngine:
                 row = conn.execute("SELECT MAX(id) FROM ledger").fetchone()
                 max_ledger_id = row[0] if row and row[0] is not None else 0
         except Exception:
-            pass
+            _oy_log.debug("ignored error", exc_info=True)
 
         # Check for LibreOffice lockfiles
         lo_lockfile = target.parent / f".~lock.{target.name}#"
@@ -623,7 +625,7 @@ class SyncEngine:
                         (max_ledger_id, datetime.utcnow().isoformat(), "failed")
                     )
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
             return False
 
         lock_file = None
@@ -683,11 +685,11 @@ class SyncEngine:
                             (max_ledger_id, datetime.utcnow().isoformat(), "failed")
                         )
                 except Exception:
-                    pass
+                    _oy_log.debug("ignored error", exc_info=True)
                 try:
                     tmp.unlink(missing_ok=True)
                 except Exception:
-                    pass
+                    _oy_log.debug("ignored error", exc_info=True)
                 return False
 
         except Exception as e:
@@ -699,11 +701,11 @@ class SyncEngine:
                         (max_ledger_id, datetime.utcnow().isoformat(), "failed")
                     )
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
             try:
                 tmp.unlink(missing_ok=True)
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
             return False
         finally:
             if _PORTALOCKER and lock_file is not None:
@@ -712,7 +714,7 @@ class SyncEngine:
                     lock_file.close()
                     lock_path.unlink(missing_ok=True)
                 except Exception:
-                    pass
+                    _oy_log.debug("ignored error", exc_info=True)
 
     # ── ODS import ──────────────────────────────────────────────────────────────
 

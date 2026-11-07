@@ -8,6 +8,8 @@ from __future__ import annotations
 import math
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 if TYPE_CHECKING:
     from openyantra.core import OpenYantra
@@ -155,7 +157,7 @@ class SutraCompiler:
                     vec_score = hit.get("vector_score", 0.0)
                     semantic_scores[(sheet, prim)] = vec_score
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
 
         # Load relation proximity mapping from the database if edges exist
         proximity_scores = {}
@@ -220,7 +222,7 @@ class SutraCompiler:
                             for (node_type, node_id), dist in visited.items():
                                 proximity_scores[(node_type, node_id)] = 1.0 / (1.0 + dist)
             except Exception:
-                pass
+                _oy_log.debug("ignored error", exc_info=True)
 
         now = datetime.utcnow()
 
@@ -270,7 +272,7 @@ class SutraCompiler:
                     try:
                         importance_val = float(row["Importance"]) / 10.0
                     except ValueError:
-                        pass
+                        _oy_log.debug("ignored error", exc_info=True)
                 elif row.get("Priority"):
                     p = str(row["Priority"]).lower()
                     if "high" in p: importance_val = 0.8

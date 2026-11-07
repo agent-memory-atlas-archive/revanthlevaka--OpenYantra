@@ -14,6 +14,8 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
+import logging as _oy_logging
+_oy_log = _oy_logging.getLogger("openyantra")
 
 logger = logging.getLogger("openyantra.nidra")
 
@@ -43,7 +45,7 @@ class NidraConsolidator:
                         return True, models[0].get("name", "llama3")
                     return True, "llama3"
         except Exception:
-            pass
+            _oy_log.debug("ignored error", exc_info=True)
         return False, None
 
     def query_ollama(self, prompt: str, model: str, timeout_sec: float = 10.0) -> Optional[str]:
