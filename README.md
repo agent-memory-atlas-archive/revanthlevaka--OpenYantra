@@ -297,6 +297,12 @@ The architecture mirrors this philosophy precisely:
 
 ---
 
+## 💛 Support OpenYantra
+
+OpenYantra is free, local-first and open source. If it saves you time, you can support its development through [GitHub Sponsors](https://github.com/sponsors/revanthlevaka) with monthly or one-time tiers. Sponsors are listed in [SPONSORS.md](SPONSORS.md).
+
+Prefer to support with compute credits (for example Claude or Cursor credits)? Reach out through the contact details on my [GitHub profile](https://github.com/revanthlevaka).
+
 ## 📄 License & Community
 
 - **Protocol Specification:** [CC0 1.0 Universal](PROTOCOL.md) (Public Domain)
