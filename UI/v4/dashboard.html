@@ -97,8 +97,6 @@ nav{position:fixed;top:52px;left:0;bottom:0;width:200px;z-index:99;background:va
 nav::-webkit-scrollbar{width:2px;}
 .ntab{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 20px;background:transparent;border:none;border-bottom:1px solid var(--border);border-right:none;color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:12px;width:100%;text-align:left;transition:var(--tr);}
 .ntab span{transition:opacity 0.28s var(--ease), width 0.28s var(--ease);}
-.ntab .ni{font-style:normal;font-size:9px;letter-spacing:0.08em;color:var(--muted);width:20px;flex:none;transition:var(--tr);}
-.ntab.active .ni,.ntab:hover .ni{color:var(--amber);}
 .ntab .nc{margin-left:auto;font-weight:400;font-size:9px;letter-spacing:0.04em;line-height:1;padding:3px 6px;min-width:20px;text-align:center;color:var(--text-dim);border:1px solid var(--border2);}
 .ntab .nc:empty{display:none;}
 .ntab .nc.hot{color:var(--amber);border-color:var(--amber);}
@@ -112,8 +110,10 @@ main{margin-top:52px;padding:24px;margin-left:200px;padding-bottom:80px;position
 /* Collapsed Sidebar overrides */
 body.sidebar-collapsed nav{width:60px;}
 body.sidebar-collapsed .ntab span,body.sidebar-collapsed .ntab .nc{opacity:0;pointer-events:none;width:0;display:none;}
-body.sidebar-collapsed .ntab .ni{width:auto;}
 body.sidebar-collapsed .ntab{padding:14px 0;justify-content:center;}
+body.sidebar-collapsed .ntab::before{content:'';width:6px;height:6px;background:var(--border2);flex:none;}
+body.sidebar-collapsed .ntab:hover::before{background:var(--text-dim);}
+body.sidebar-collapsed .ntab.active::before{background:var(--amber);}
 body.sidebar-collapsed .ntab.active{padding-left:0;border-left:3px solid var(--amber);}
 body.sidebar-collapsed main{margin-left:60px;}
 
@@ -369,21 +369,21 @@ tr:hover td{background:var(--surface2);}
 </div>
 
 <nav>
-  <button class="ntab active" onclick="go('today',this)" title="Today"><i class="ni">TD</i><span>Today</span><b class="nc" id="nc-today"></b></button>
-  <button class="ntab" onclick="go('inbox',this)" title="Inbox"><i class="ni">IN</i><span>Inbox</span><b class="nc" id="nc-inbox"></b></button>
-  <button class="ntab" onclick="go('loops',this)" title="Loops"><i class="ni">LP</i><span>Loops</span><b class="nc" id="nc-loops"></b></button>
-  <button class="ntab" onclick="go('projects',this)" title="Projects"><i class="ni">PJ</i><span>Projects</span><b class="nc" id="nc-projects"></b></button>
-  <button class="ntab" onclick="go('oracle',this)" title="Oracle"><i class="ni">OR</i><span>Oracle</span><b class="nc" id="nc-oracle"></b></button>
-  <button class="ntab" onclick="go('review',this)" title="Review"><i class="ni">RV</i><span>Review</span><b class="nc" id="nc-review"></b></button>
-  <button class="ntab" onclick="go('timeline',this)" title="Timeline"><i class="ni">TL</i><span>Timeline</span><b class="nc" id="nc-timeline"></b></button>
-  <button class="ntab" onclick="go('security',this)" title="Security"><i class="ni">SC</i><span>Security</span><b class="nc" id="nc-security"></b></button>
-  <button class="ntab" onclick="go('ledger',this)" title="Ledger"><i class="ni">LG</i><span>Ledger</span><b class="nc" id="nc-ledger"></b></button>
-  <button class="ntab" onclick="go('health',this)" title="Health"><i class="ni">HL</i><span>Health</span><b class="nc" id="nc-health"></b></button>
-  <button class="ntab" onclick="go('cognitive_memories',this)" title="Memories"><i class="ni">MM</i><span>Memories</span><b class="nc" id="nc-cognitive_memories"></b></button>
-  <button class="ntab" onclick="go('cognitive_hierarchy',this)" title="Hierarchy"><i class="ni">HR</i><span>Hierarchy</span><b class="nc" id="nc-cognitive_hierarchy"></b></button>
-  <button class="ntab" onclick="go('cognitive_graph',this)" title="Graph"><i class="ni">GR</i><span>Graph</span><b class="nc" id="nc-cognitive_graph"></b></button>
-  <button class="ntab" onclick="go('context_compile',this)" title="Context"><i class="ni">CX</i><span>Context</span><b class="nc" id="nc-context_compile"></b></button>
-  <button class="ntab" onclick="go('config_settings',this)" title="Settings"><i class="ni">ST</i><span>Settings</span><b class="nc" id="nc-config_settings"></b></button>
+  <button class="ntab active" onclick="go('today',this)" title="Today"><span>Today</span><b class="nc" id="nc-today"></b></button>
+  <button class="ntab" onclick="go('inbox',this)" title="Inbox"><span>Inbox</span><b class="nc" id="nc-inbox"></b></button>
+  <button class="ntab" onclick="go('loops',this)" title="Loops"><span>Loops</span><b class="nc" id="nc-loops"></b></button>
+  <button class="ntab" onclick="go('projects',this)" title="Projects"><span>Projects</span><b class="nc" id="nc-projects"></b></button>
+  <button class="ntab" onclick="go('oracle',this)" title="Oracle"><span>Oracle</span><b class="nc" id="nc-oracle"></b></button>
+  <button class="ntab" onclick="go('review',this)" title="Review"><span>Review</span><b class="nc" id="nc-review"></b></button>
+  <button class="ntab" onclick="go('timeline',this)" title="Timeline"><span>Timeline</span><b class="nc" id="nc-timeline"></b></button>
+  <button class="ntab" onclick="go('security',this)" title="Security"><span>Security</span><b class="nc" id="nc-security"></b></button>
+  <button class="ntab" onclick="go('ledger',this)" title="Ledger"><span>Ledger</span><b class="nc" id="nc-ledger"></b></button>
+  <button class="ntab" onclick="go('health',this)" title="Health"><span>Health</span><b class="nc" id="nc-health"></b></button>
+  <button class="ntab" onclick="go('cognitive_memories',this)" title="Memories"><span>Memories</span><b class="nc" id="nc-cognitive_memories"></b></button>
+  <button class="ntab" onclick="go('cognitive_hierarchy',this)" title="Hierarchy"><span>Hierarchy</span><b class="nc" id="nc-cognitive_hierarchy"></b></button>
+  <button class="ntab" onclick="go('cognitive_graph',this)" title="Graph"><span>Graph</span><b class="nc" id="nc-cognitive_graph"></b></button>
+  <button class="ntab" onclick="go('context_compile',this)" title="Context"><span>Context</span><b class="nc" id="nc-context_compile"></b></button>
+  <button class="ntab" onclick="go('config_settings',this)" title="Settings"><span>Settings</span><b class="nc" id="nc-config_settings"></b></button>
 </nav>
 
 <main>
