@@ -750,12 +750,9 @@ async def api_nidra_consolidate(req: Request):
 async def api_vault_sync(req: Request):
     """Bi-directional sync with Obsidian Markdown vault."""
     oy = get_oy()
-    data = {}
-    try:
-        data = await req.json()
-    except Exception:
-        pass
-    vault_path = data.get("path", "~/openyantra_vault")
+    # The vault location is server-side configuration, never taken from the
+    # request, so a web page cannot point the sync at an arbitrary folder.
+    vault_path = os.environ.get("OPENYANTRA_VAULT_DIR", "~/openyantra_vault")
     from openyantra.yantra_vault import VaultSync
     try:
         sync = VaultSync(oy, vault_path)
