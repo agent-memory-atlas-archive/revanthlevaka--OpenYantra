@@ -23,6 +23,14 @@ class VaultSync:
         self.oy = oy
         self.vault_dir = self._checked_dir(vault_dir)
 
+    def _p(self, *parts: str) -> Path:
+        """Join parts under the vault and refuse anything that escapes it."""
+        base = os.path.normpath(str(self.vault_dir))
+        full = os.path.normpath(os.path.join(base, *parts))
+        if full != base and not full.startswith(base + os.sep):
+            raise ValueError("path escapes the vault directory")
+        return Path(full)
+
     @staticmethod
     def _checked_dir(vault_dir: str | Path) -> Path:
         """Resolve the vault path and keep it inside an allowed root.
@@ -47,10 +55,10 @@ class VaultSync:
         """
         Exports all key knowledge domains into structured Markdown files with YAML frontmatter.
         """
-        self.vault_dir.mkdir(parents=True, exist_ok=True)
-        (self.vault_dir / "Projects").mkdir(exist_ok=True)
-        (self.vault_dir / "People").mkdir(exist_ok=True)
-        (self.vault_dir / "Sessions").mkdir(exist_ok=True)
+        self._p().mkdir(parents=True, exist_ok=True)
+        self._p("Projects").mkdir(exist_ok=True)
+        self._p("People").mkdir(exist_ok=True)
+        self._p("Sessions").mkdir(exist_ok=True)
 
         exported_files = []
 
@@ -62,7 +70,7 @@ class VaultSync:
             val = row.get("Value") or ""
             if attr:
                 id_lines.append(f"- **{attr}**: {val}")
-        id_path = self.vault_dir / "Identity.md"
+        id_path = self._p("Identity.md")
         with open(id_path, "w", encoding="utf-8") as f:
             f.write("\n".join(id_lines) + "\n")
         exported_files.append(str(id_path))
@@ -82,7 +90,7 @@ class VaultSync:
             if notes and str(notes).lower() != "nan":
                 b_lines.append(f"- *Notes*: {notes}")
             b_lines.append("")
-        b_path = self.vault_dir / "Beliefs.md"
+        b_path = self._p("Beliefs.md")
         with open(b_path, "w", encoding="utf-8") as f:
             f.write("\n".join(b_lines) + "\n")
         exported_files.append(str(b_path))
@@ -104,7 +112,7 @@ class VaultSync:
             l_lines.append(f"- [{mark}] **{topic}** (Priority: {prio}){proj_link}")
             if ctx and str(ctx).lower() != "nan":
                 l_lines.append(f"  - Context: {ctx}")
-        l_path = self.vault_dir / "Open Loops.md"
+        l_path = self._p("Open Loops.md")
         with open(l_path, "w", encoding="utf-8") as f:
             f.write("\n".join(l_lines) + "\n")
         exported_files.append(str(l_path))
@@ -131,7 +139,7 @@ class VaultSync:
                 f"## Overview\n{summary}\n" if summary else "",
                 "## Related Notes\n- See also: [[Open Loops]], [[Identity]]\n"
             ]
-            proj_file = self.vault_dir / "Projects" / f"{safe_name}.md"
+            proj_file = self._p("Projects", f"{safe_name}.md")
             with open(proj_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(p_lines) + "\n")
             exported_files.append(str(proj_file))
@@ -157,7 +165,7 @@ class VaultSync:
                 f"## Context\n{ctx}\n" if ctx else "",
                 f"## Notes\n{notes}\n" if notes else ""
             ]
-            person_file = self.vault_dir / "People" / f"{safe_name}.md"
+            person_file = self._p("People", f"{safe_name}.md")
             with open(person_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(p_lines) + "\n")
             exported_files.append(str(person_file))
@@ -175,14 +183,14 @@ class VaultSync:
         - Resolving checked open loops (`- [x] **Topic**`)
         - Ingesting newly added unchecked open loops (`- [ ] New loop`)
         """
-        if not self.vault_dir.exists():
+        if not self._p().exists():
             return {"status": "error", "message": f"Vault dir {self.vault_dir} not found"}
 
         loops_resolved = []
         new_loops_created = []
 
         # 1. Parse Open Loops.md
-        loops_path = self.vault_dir / "Open Loops.md"
+        loops_path = self._p("Open Loops.md")
         if loops_path.exists():
             with open(loops_path, "r", encoding="utf-8") as f:
                 content = f.read()
@@ -221,7 +229,7 @@ class VaultSync:
 
         # 2. Check for an optional Inbox.md in the vault
         inbox_imported = []
-        inbox_path = self.vault_dir / "Inbox.md"
+        inbox_path = self._p("Inbox.md")
         if inbox_path.exists():
             with open(inbox_path, "r", encoding="utf-8") as f:
                 lines = f.readlines()
