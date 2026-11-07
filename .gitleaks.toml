@@ -1,0 +1,10 @@
+title = "OpenYantra Gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Fake credentials used as fixtures for the Raksha sanitiser tests"
+paths = [
+  '''tests/test_security_sanitizer\.py''',
+]
