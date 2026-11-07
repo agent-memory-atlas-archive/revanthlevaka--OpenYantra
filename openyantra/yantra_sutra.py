@@ -7,12 +7,9 @@ from __future__ import annotations
 
 import math
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
+from typing import Any, Optional
 import logging as _oy_logging
 _oy_log = _oy_logging.getLogger("openyantra")
-
-if TYPE_CHECKING:
-    from openyantra.core import OpenYantra
 
 EMOJI_TO_SECTION = {
     "👤 Identity": "identity",
@@ -59,7 +56,7 @@ def parse_date(val) -> Optional[datetime]:
 
 
 class SutraCompiler:
-    def __init__(self, oy: OpenYantra, settings: Optional[dict] = None):
+    def __init__(self, oy: Any, settings: Optional[dict] = None):
         self.oy = oy
         self.settings = settings or {}
 

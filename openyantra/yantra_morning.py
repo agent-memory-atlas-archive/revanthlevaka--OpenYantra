@@ -29,10 +29,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
     from openyantra import (
-        OpenYantra,
-        SHEET_OPEN_LOOPS, SHEET_PROJECTS, SHEET_TASKS,
-        SHEET_INBOX, SHEET_SESSION_LOG, SHEET_BELIEFS,
-        SHEET_GOALS, SHEET_IDENTITY,
+        OpenYantra, SHEET_OPEN_LOOPS, SHEET_PROJECTS, SHEET_INBOX, SHEET_SESSION_LOG, SHEET_BELIEFS, SHEET_GOALS, SHEET_IDENTITY,
     )
     _OY_AVAILABLE = True
 except ImportError:

@@ -41,10 +41,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from openyantra import (
-        OpenYantra, WriteRequest,
-        SHEET_OPEN_LOOPS, SHEET_TASKS, SHEET_GOALS
-    )
+    from openyantra import OpenYantra, WriteRequest, SHEET_OPEN_LOOPS, SHEET_GOALS
 except ImportError:
     print("openyantra.py not found in the same directory.")
     sys.exit(1)

@@ -28,7 +28,7 @@ try:
         SHEET_GOALS
     )
 except ImportError:
-    print("openyantra.py not found. Ensure it's in the same directory.")
+    sys.stderr.write("openyantra.py not found. Ensure it's in the same directory.\n")
     sys.exit(1)
 
 

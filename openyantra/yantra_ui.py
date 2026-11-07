@@ -24,7 +24,7 @@ try:
     from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
     import uvicorn
 except ImportError:
-    print("pip install fastapi uvicorn"); sys.exit(1)
+    sys.stderr.write("pip install fastapi uvicorn\n"); sys.exit(1)
 
 try:
     from openyantra import (
@@ -36,7 +36,7 @@ try:
         SHEET_QUARANTINE, SHEET_SECURITY_LOG,
     )
 except ImportError:
-    print("openyantra.py not found."); sys.exit(1)
+    sys.stderr.write("openyantra.py not found.\n"); sys.exit(1)
 
 from openyantra.cognitive_db import CognitiveMemoryStore
 import secrets

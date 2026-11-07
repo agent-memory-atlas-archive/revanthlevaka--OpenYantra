@@ -28,12 +28,7 @@ _oy_log = _oy_logging.getLogger("openyantra")
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from openyantra import (
-        OpenYantra,
-        SHEET_IDENTITY, SHEET_GOALS, SHEET_PROJECTS, SHEET_PEOPLE,
-        SHEET_PREFERENCES, SHEET_BELIEFS, SHEET_TASKS,
-        SHEET_OPEN_LOOPS, SHEET_AGENT_CONFIG,
-    )
+    from openyantra import OpenYantra, SHEET_PEOPLE, SHEET_PREFERENCES, SHEET_BELIEFS
     _OY_AVAILABLE = True
 except ImportError:
     _OY_AVAILABLE = False
