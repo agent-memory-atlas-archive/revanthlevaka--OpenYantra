@@ -123,7 +123,11 @@ class NidraConsolidator:
 
         texts_to_scan = []
         for s in sessions[-30:]:
-            texts_to_scan.append(str(s.get("Decisions Made") or s.get("Decisions") or s.get("Decisions / Outputs") or ""))
+            dec_text = str(s.get("Decisions Made") or s.get("Decisions") or s.get("Decisions / Outputs") or "")
+            # Skip scanning reverted / superseded decisions so undone choices are not promoted
+            if "reverted" in dec_text.lower() or "superseded" in dec_text.lower():
+                continue
+            texts_to_scan.append(dec_text)
             texts_to_scan.append(str(s.get("Topics Discussed") or s.get("Topic") or ""))
             texts_to_scan.append(str(s.get("Notes") or s.get("Next Actions") or ""))
         for i in inbox_items[-20:]:

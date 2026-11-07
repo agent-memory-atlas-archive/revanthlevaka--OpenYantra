@@ -29,22 +29,27 @@
 
 ---
 
-## The Problem -- Why Your AI Forgets
+## The Problem -- Why Your AI Forgets (Session Amnesia)
 
-Every time you open a new chat with Claude, ChatGPT, Cursor, or terminal agents, they start completely blank. They don't know your active projects, architectural decisions from last week, or what you left unfinished. You repeat yourself every session.
+Every time you open a fresh window in **Claude Desktop**, **Cursor**, **ChatGPT**, or terminal coding agents, they wake up with complete amnesia. They don't know yesterday's architecture decisions, active project milestones, or what you were debugging before you shut your laptop. You waste time re-explaining your stack and re-prompting every single day.
 
-When conversation context windows fill up, the AI compresses older messages -- your active work context vanishes mid-task.
+When conversation context windows fill up, the AI quietly compresses older messages -- and your active context vanishes mid-task.
 
-**OpenYantra solves this permanently:**
+### How OpenYantra Compares
 
-| Without OpenYantra | With OpenYantra |
-|---|---|
-| AI starts completely amnesiac every session | AI knows your projects, goals, beliefs, and contacts |
-| Repetitive prompt engineering every day | Dynamic context block compiled & injected in milliseconds |
-| Unfinished work lost in context compaction | Open Loops (Anishtha) flushed before compaction & restored after |
-| Accidental API keys & secrets leak into agent memory | Raksha Credential Redactor automatically sanitizes tokens |
-| Trapped in proprietary vector database clouds | 100% open local files: `.ods` (LibreOffice), `.sqlite`, `.md` |
-| Clunky browser tabs you forget to check | Omnipresent Desktop HUD (`Cmd+Shift+Y`) over Cursor & VS Code |
+Developers often try two extremes: hand-curating a `NOTES.md` file or piping everything to a hosted vector cloud. Here is why both fall short:
+
+| Capability | Hand-Kept `NOTES.md` | Cloud Vector DB (Pinecone / MemGPT SaaS) | **OpenYantra** |
+| :--- | :--- | :--- | :--- |
+| **Multi-Tool Sync** | ❌ Manual copy-paste; cannot live-sync across Claude Desktop & Cursor simultaneously | ⚠️ Requires proprietary API keys, network latency, and per-tool plugins | ✅ **Zero-effort live sync**: Desktop HUD (`Cmd+Shift+Y`), CLI, and MCP share the exact same local SQLite WAL |
+| **Revert / Undo Awareness** | ❌ Static notes ignore git history; stale decisions linger indefinitely | ❌ High risk of context regression (old vector matches resurrect discarded choices) | ✅ **Git Revert Tracking**: Commit reverts automatically tag decisions `[REVERTED / SUPERSEDED]`; Nidra excludes them from beliefs |
+| **Secret & Key Safety** | ❌ High risk of committing API tokens into plaintext notes | ❌ API keys and private code snippets stream to third-party cloud servers | ✅ **Raksha Redactor**: Pattern-matches and sanitizes OpenAI, Anthropic, AWS, GitHub tokens before saving |
+| **Storage & Data Ownership**| ✅ Local plain text | ❌ Cloud lock-in, recurring monthly SaaS fees, opaque embeddings | ✅ **100% Open & Local**: Standard `.ods` (LibreOffice ISO/IEC 26300), `.sqlite`, and `.md` |
+| **Capture Friction** | ❌ High friction -- requires manually switching tabs and updating files | ⚠️ Agent-dependent; no universal OS hotkey | ✅ **Frictionless**: Global hotkey HUD (`Cmd+Shift+Y`), Git post-commit hooks, and MCP tools |
+| **Consolidation & Pruning** | ❌ Notes file grows uncontrollably into unreadable clutter | ⚠️ Blind similarity search returns contradictory chunks | ✅ **Nidra Sleep Engine**: Clusters daily sessions, closes open loops, and promotes recurring preferences |
+
+> **💡 Does the Desktop HUD write to the same store the MCP server reads?**  
+> **Yes, 100%.** Both the native Desktop HUD (`Cmd+Shift+Y`), the terminal CLI, and the Cognitive MCP Server (serving Cursor & Claude Desktop) connect directly to the same local SQLite database in WAL (Write-Ahead Logging) mode. When you capture a thought or task in the HUD, your next prompt in Cursor or Claude instantly sees it with sub-millisecond read latency.
 
 ---
 
@@ -73,8 +78,8 @@ Mimics biological slow-wave sleep. Run `yantra dream` or `yantra consolidate`:
 ### 5. 🛡️ Raksha Credential & Secret Redactor Guard
 Pre-commit interceptor pattern-matches and redacts Anthropic, OpenAI, AWS, GitHub, Google API keys, Slack tokens, and private keys before committing any record to disk.
 
-### 6. 🐙 Git Commit Auto-Ingest (`yantra hook install`)
-Install a git post-commit hook in your repositories. Every time you commit code, OpenYantra automatically extracts the commit hash, branch, message, and modified files into your `Session Log`.
+### 6. 🐙 Git Commit Auto-Ingest & Revert Detection (`yantra hook install`)
+Install a git post-commit hook in your repositories. Every time you commit code, OpenYantra automatically extracts the commit hash, branch, message, and modified files into your `Session Log`. If you revert a commit (`git revert`), OpenYantra automatically detects the rollback, tags the prior decision as `[REVERTED / SUPERSEDED]`, and ensures the Nidra sleep engine never promotes undone code experiments into your core architecture beliefs.
 
 ### 7. 📟 Cyberpunk Terminal TUI (`yantra tui`)
 For command-line purists and SSH workflows. An interactive terminal dashboard displaying live open loops, active projects, recent decisions, and quick-capture hotkeys.

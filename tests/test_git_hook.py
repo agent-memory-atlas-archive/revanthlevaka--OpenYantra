@@ -50,9 +50,27 @@ def test_install_git_hook(temp_git_repo):
 def test_ingest_last_commit(temp_git_repo, mock_oy):
     res = ingest_last_commit(temp_git_repo, oy=mock_oy)
     assert res["status"] == "ingested"
+    assert res["is_revert"] is False
     assert res["subject"] == "feat: initial commit for testing"
     assert res["repo"] == "test_repo"
 
     # Verify session log in sheet
     sessions = mock_oy.get_sheet("Session Log")
     assert any("Git Activity: test_repo" in str(s.get("Topics Discussed", "")) for s in sessions)
+
+
+def test_ingest_revert_commit(temp_git_repo, mock_oy):
+    # Make a revert commit
+    (temp_git_repo / "test.txt").write_text("reverted content")
+    subprocess.run(["git", "add", "test.txt"], cwd=str(temp_git_repo), check=True)
+    subprocess.run(["git", "commit", "-m", "Revert 'feat: switch from SQLite to Postgres'"], cwd=str(temp_git_repo), check=True)
+
+    res = ingest_last_commit(temp_git_repo, oy=mock_oy)
+    assert res["status"] == "ingested"
+    assert res["is_revert"] is True
+
+    sessions = mock_oy.get_sheet("Session Log")
+    revert_session = [s for s in sessions if "REVERTED" in str(s.get("Notes", ""))]
+    assert len(revert_session) > 0
+    assert any("Reverted / Superseded Decision" in str(s.get("Decisions Made", "")) for s in revert_session)
+

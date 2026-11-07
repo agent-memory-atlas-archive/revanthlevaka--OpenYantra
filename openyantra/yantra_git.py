@@ -103,12 +103,20 @@ def ingest_last_commit(repo_path: Optional[str | Path] = None, oy: Any = None) -
 
         project_name = git_root.name
 
+        is_revert = subject.strip().lower().startswith("revert") or "reverts commit" in body.lower() or "this reverts commit" in body.lower()
+        if is_revert:
+            decision_entry = f"Reverted / Superseded Decision [{commit_hash}]: {subject}"
+        else:
+            decision_entry = f"Commit [{commit_hash}]: {subject}"
+
         if oy:
             notes = f"Repo: {project_name} | Branch: {branch} | Hash: {commit_hash}"
+            if is_revert:
+                notes += " | Status: REVERTED"
             if changed_files:
                 notes += f" | Files: {', '.join(changed_files[:5])}"
 
-            decisions = [f"Commit [{commit_hash}]: {subject}"]
+            decisions = [decision_entry]
             if body:
                 decisions.append(f"Details: {body[:150]}")
 
@@ -120,6 +128,7 @@ def ingest_last_commit(repo_path: Optional[str | Path] = None, oy: Any = None) -
 
         return {
             "status": "ingested",
+            "is_revert": is_revert,
             "repo": project_name,
             "branch": branch,
             "commit": commit_hash,

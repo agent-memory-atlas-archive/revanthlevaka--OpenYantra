@@ -39,11 +39,20 @@ def test_nidra_detect_and_promote_preferences(mock_oy):
         topics=["Architecture"],
         decisions=["User prefers dark mode across all interfaces", "rule: always write python unit tests"]
     )
+    # Log a reverted decision that should NOT be promoted
+    mock_oy.log_session(
+        topics=["Reverted Database Experiment"],
+        decisions=["Reverted / Superseded Decision: user prefers Postgres over SQLite"],
+        notes="Status: REVERTED"
+    )
     nidra = NidraConsolidator(mock_oy)
     candidates = nidra.detect_promotable_preferences()
     assert len(candidates) >= 1
-    found = any("dark mode" in c["Belief / Principle"].lower() for c in candidates)
-    assert found
+    found_dark_mode = any("dark mode" in c["Belief / Principle"].lower() for c in candidates)
+    assert found_dark_mode
+    found_reverted = any("postgres" in c["Belief / Principle"].lower() for c in candidates)
+    assert not found_reverted, "Reverted decision should not be promoted into beliefs"
+
 
 
 def test_nidra_prune_and_resolve_loops(mock_oy):
