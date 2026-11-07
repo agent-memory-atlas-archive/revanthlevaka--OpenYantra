@@ -12,6 +12,12 @@ from openyantra.adapters.langchain import (
     AIMessage,
 )
 from openyantra.adapters.crewai import OpenYantraCrewMemory
+from openyantra.adapters.openclaw import (
+    session_start_hook,
+    pre_compact_hook,
+    post_compact_hook,
+    session_end_hook,
+)
 
 
 @pytest.fixture
@@ -78,3 +84,33 @@ def test_crewai_memory_save_and_route(mock_oy):
 
     projects = mock_oy.get_sheet("Projects")
     assert any("QuantumSync" in str(p.get("Project", "")) for p in projects)
+
+
+def test_openclaw_adapter_lifecycle(tmp_path):
+    oy_file = tmp_path / "chitrapat.ods"
+    oy = OpenYantra(oy_file, agent_name="OpenClaw")
+    oy.bootstrap(user_name="Agent Tester", occupation="Bot")
+    oy.flush_open_loop(topic="Pending deployment", context="Needs CI/CD", priority="High")
+
+    # 1. session_start_hook
+    start_payload = {"system_prompt": "Base agent instructions."}
+    res_start = session_start_hook(start_payload, file_path=oy_file)
+    assert "[OPENYANTRA CONTEXT" in res_start["system_prompt"]
+    assert "Base agent instructions." in res_start["system_prompt"]
+
+    # 2. pre_compact_hook
+    pre_payload = {"conversation": ["msg1", "msg2"]}
+    res_pre = pre_compact_hook(pre_payload, file_path=oy_file)
+    assert res_pre == pre_payload
+
+    # 3. post_compact_hook (restores open loops)
+    post_payload = {"new_context": "Compacted history summary"}
+    res_post = post_compact_hook(post_payload, file_path=oy_file)
+    assert "Anishtha restored after compaction" in res_post["new_context"]
+    assert "Pending deployment" in res_post["new_context"]
+
+    # 4. session_end_hook
+    end_payload = {"topics": ["Deployment"], "decisions": ["Approved v6.2.0"], "new_memory": []}
+    res_end = session_end_hook(end_payload, file_path=oy_file)
+    assert res_end == end_payload
+

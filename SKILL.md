@@ -163,7 +163,7 @@ Sync   = bidirectional: yantra sync imports ODS edits back
 ### System Prompt Block
 
 ```
-[OPENYANTRA CONTEXT -- v4.1.0 | Chitragupta-secured]
+[OPENYANTRA CONTEXT -- v6.2.0 | Chitragupta-secured]
 User: {Name} | {Occupation} | {Location}
 Active Projects (Karma): {Project} -> {NextStep}
 Open Loops (Anishtha, top 15): [{Priority}] {Topic} -- {Context}

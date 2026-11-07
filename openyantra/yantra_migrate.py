@@ -1,5 +1,5 @@
 """
-yantra_migrate.py -- OpenYantra Schema Migration Tool v4.1.0
+yantra_migrate.py -- OpenYantra Schema Migration Tool v6.2.0
 Upgrades older Chitrapat files to the current schema.
 
 Detects version from sheet count and column presence.
@@ -194,11 +194,11 @@ def run_migration(path: str, dry_run: bool = False) -> dict:
     from_version = detect_version(str(file_path))
 
     print(f"\n{'='*55}")
-    print(f"  OpenYantra Migration Tool v4.1.0")
+    print(f"  OpenYantra Migration Tool v6.2.0")
     print(f"{'='*55}")
     print(f"\n  File:         {file_path}")
     print(f"  Detected:     v{from_version}")
-    print(f"  Target:       v4.1.0")
+    print(f"  Target:       v6.2.0")
 
     if from_version in ("2.4+",):
         print(f"\n  ✓ Already at v2.4+ schema -- checking for v4.1.0 additions...")
@@ -360,7 +360,7 @@ def _write_sheet(path: str, sheet_name: str, df: pd.DataFrame):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="OpenYantra Schema Migration Tool v4.1.0"
+        description="OpenYantra Schema Migration Tool v6.2.0"
     )
     parser.add_argument(
         "--file", "-f",

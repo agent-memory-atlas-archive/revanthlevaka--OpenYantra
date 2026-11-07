@@ -98,7 +98,7 @@ Changelog = "https://github.com/revanthlevaka/OpenYantra/blob/main/CHANGELOG.md"
 yantra = "openyantra.cli:main"
 
 [tool.setuptools]
-packages = ["openyantra"]
+packages = ["openyantra", "openyantra.adapters"]
 
 [tool.setuptools.package-data]
 "*" = ["chitrapat_template.ods", "SKILL.md"]

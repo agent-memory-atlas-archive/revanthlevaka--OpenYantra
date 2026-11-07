@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════
-#  OpenYantra v5.0.0 Installer -- Windows (PowerShell)
+#  OpenYantra v6.2.0 Installer -- Windows (PowerShell)
 #  The Sacred Memory Machine
 #  Inspired by Chitragupta, the Hindu God of Data
 #
@@ -152,7 +152,7 @@ function Install-Deps {
 function Download-Files {
     Write-Step "Downloading OpenYantra v$VERSION files"
 
-    $dirs = @("openclaw", "examples", "references", "docs", "assets", "UI\v4")
+    $dirs = @("openyantra\adapters", "examples", "references", "docs", "assets", "UI\v4")
     foreach ($d in $dirs) {
         New-Item -ItemType Directory -Path "$INSTALL_DIR\$d" -Force | Out-Null
     }
@@ -168,11 +168,10 @@ function Download-Files {
         "openyantra/yantra_sutra.py", "openyantra/yantra_nidra.py",
         "openyantra/yantra_vault.py", "openyantra/mcp_setup.py",
         "openyantra/adapters/__init__.py", "openyantra/adapters/langchain.py",
-        "openyantra/adapters/crewai.py", "openyantra/yantra_git.py",
-        "openyantra/yantra_tui.py", "openyantra/desktop.py",
-        "openyantra/cognitive_mcp.py",
+        "openyantra/adapters/crewai.py", "openyantra/adapters/openclaw.py",
+        "openyantra/yantra_git.py", "openyantra/yantra_tui.py",
+        "openyantra/desktop.py", "openyantra/cognitive_mcp.py",
         "openyantra/cognitive_db.py", "openyantra/chitrapat_template.ods",
-        "openclaw/hooks.py", "openclaw/plugin.py", "openclaw/__init__.py",
         "examples/bootstrap.py", "examples/langchain_adapter.py",
         "examples/__init__.py", "references/controlled-vocab.md",
         "docs/DEPLOYMENT.md", "PROTOCOL.md", "SKILL.md",

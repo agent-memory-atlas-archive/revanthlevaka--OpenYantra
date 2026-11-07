@@ -1,5 +1,5 @@
 """
-yantra_sqlite.py -- OpenYantra SQLite SyncEngine v4.1.0
+yantra_sqlite.py -- OpenYantra SQLite SyncEngine v6.2.0
 The Setu (सेतु -- Bridge) between Chitrapat.ods and fast local storage.
 
 Architecture decision (7/7 consensus, Round 5 stress test):
@@ -17,7 +17,7 @@ Key guarantees:
 Performance (measured, Round 5):
   SQLite WAL write: 2ms flat at any row count
   ODS export:       78ms@200rows, 366ms@1000rows, 2012ms@5000rows
-  Combined v4.1.0:    2ms SQLite + 2ms incremental index = 4ms per write
+  Combined v6.2.0:    2ms SQLite + 2ms incremental index = 4ms per write
                     ODS export triggered async, not on hot path
 
 Usage:
@@ -55,7 +55,7 @@ try:
 except ImportError:
     _PANDAS = False
 
-VERSION = "5.0.0"
+VERSION = "6.2.0"
 
 # Sheet name to SQLite table name mapping
 SHEET_TABLE_MAP = {
@@ -382,7 +382,7 @@ CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target_type, target_id);
 
 class SyncEngine:
     """
-    Setu (सेतु -- Bridge) -- SQLite operational backend for OpenYantra v4.1.0.
+    Setu (सेतु -- Bridge) -- SQLite operational backend for OpenYantra v6.2.0.
 
     The SyncEngine sits beneath Chitragupta (LedgerAgent).
     Chitragupta still enforces all write rules, admission gates,

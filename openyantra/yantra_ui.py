@@ -1,9 +1,10 @@
 """
-yantra_ui.py -- OpenYantra Browser Dashboard v4.1.0
+yantra_ui.py -- OpenYantra Browser Dashboard v6.2.0
 Run: yantra ui -> http://localhost:7331
 
-v4.1.0:
+v6.2.0:
   - Serves UI/v4/dashboard.html (Briefing Room) via FileResponse
+  - Serves UI/v4/hud.html (Spotlight HUD)
   - /api/oracle endpoint wired to oracle-card
   - /api/export endpoint
   - 13 tabs: Today, Inbox, Loops, Projects, Oracle, Review, Timeline, Security, Ledger, Health, Memories, Hierarchy, Graph
@@ -45,7 +46,7 @@ from openyantra.yantra_passkey import (
     check_authentication_response
 )
 
-app = FastAPI(title="OpenYantra", version="5.0.0", docs_url=None, redoc_url=None)
+app = FastAPI(title="OpenYantra", version="6.2.0", docs_url=None, redoc_url=None)
 _oy = None
 _cog_store = None
 

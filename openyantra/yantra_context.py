@@ -1,5 +1,5 @@
 """
-yantra_context.py -- OpenYantra Copy Context v4.1.0
+yantra_context.py -- OpenYantra Copy Context v6.2.0
 
 Formats your full memory as a clean Markdown block.
 Copies to clipboard automatically.
@@ -35,7 +35,7 @@ try:
 except ImportError:
     _OY_AVAILABLE = False
 
-VERSION = "5.0.0"
+VERSION = "6.2.0"
 
 ALL_SECTIONS = [
     "identity", "goals", "projects", "people",
@@ -302,7 +302,7 @@ def run_context(oy_path: str, output_file: str = None,
 def main():
     import argparse
     parser = argparse.ArgumentParser(
-        description="OpenYantra Copy Context v5.0.0 (Sutra Pruning Engine)")
+        description="OpenYantra Copy Context v6.2.0 (Sutra Pruning Engine)")
     parser.add_argument("--file", "-f",
                         default=str(Path.home() / "openyantra" / "chitrapat.ods"))
     parser.add_argument("--output", "-o", default=None,

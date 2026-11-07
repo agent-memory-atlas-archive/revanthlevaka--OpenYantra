@@ -445,12 +445,12 @@ class LedgerAgent:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# OpenYantra -- public API v2.1
+# OpenYantra -- public API v6.2.0
 # ══════════════════════════════════════════════════════════════════════════════
 
 class OpenYantra:
     """
-    OpenYantra v2.12 -- The Sacred Memory Machine
+    OpenYantra v6.2.0 -- The Sacred Memory Machine
 
     New in v2.1:
         oy.inbox(text)           -- quick capture to Inbox sheet
@@ -2302,7 +2302,7 @@ def run_bootstrap_interview(path: str, agent_name: str = "Chitragupta"):
 
     print("\n" + "="*62)
     print("  OpenYantra -- Chitragupta Puja")
-    print("  The Sacred Memory Machine v2.6")
+    print(f"  The Sacred Memory Machine v{OpenYantra.VERSION}")
     print("  Inspired by Chitragupta, the Hindu God of Data")
     print("="*62)
     print("\nNamaste. I am Chitragupta, your memory keeper.")

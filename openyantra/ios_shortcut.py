@@ -1,5 +1,5 @@
 """
-ios_shortcut.py -- OpenYantra iOS Shortcut Integration v2.12
+ios_shortcut.py -- OpenYantra iOS Shortcut Integration v6.2.0
 Local HTTP endpoint that receives captures from iOS Shortcuts.
 
 How it works:
@@ -106,7 +106,7 @@ class ShortcutHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
-            self.wfile.write(b"OpenYantra iOS Shortcut Server v2.12 -- POST /inbox to capture")
+            self.wfile.write(b"OpenYantra iOS Shortcut Server v6.2.0 -- POST /inbox to capture")
 
     def do_OPTIONS(self):
         """CORS preflight."""
@@ -139,7 +139,7 @@ def get_local_ip() -> str:
 
 def print_shortcut_instructions(ip: str, port: int):
     print(f"\n{'='*60}")
-    print(f"  OpenYantra iOS Shortcut Server v2.12")
+    print(f"  OpenYantra iOS Shortcut Server v6.2.0")
     print(f"{'='*60}")
     print(f"\n  Server URL: http://{ip}:{port}/inbox")
     print(f"\n  iPhone Shortcut setup:")
@@ -162,7 +162,7 @@ def print_shortcut_instructions(ip: str, port: int):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="OpenYantra iOS Shortcut Server v2.12"
+        description="OpenYantra iOS Shortcut Server v6.2.0"
     )
     parser.add_argument(
         "--file", "-f",

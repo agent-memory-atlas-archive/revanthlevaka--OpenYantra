@@ -1,5 +1,5 @@
 """
-tests/test_sutradhar.py -- Unit tests for Sutradhar Graph Layer v5.0.0
+tests/test_sutradhar.py -- Unit tests for Sutradhar Graph Layer v6.2.0
 Tests: edges table, add_edge, delete_edge, get_edges, traverse CTE, infer_edges
 """
 

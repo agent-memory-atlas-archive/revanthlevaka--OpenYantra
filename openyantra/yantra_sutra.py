@@ -1,5 +1,5 @@
 """
-yantra_sutra.py -- Sutra Context Pruning Engine (v5.0.0)
+yantra_sutra.py -- Sutra Context Pruning Engine (v6.2.0)
 Calculates memory weights and greedy-packs context items to fit token budgets.
 """
 

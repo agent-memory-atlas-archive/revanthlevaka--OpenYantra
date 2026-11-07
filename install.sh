@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════
-#  OpenYantra v5.0.0 Installer -- Mac + Linux
+#  OpenYantra v6.2.0 Installer -- Mac + Linux
 #  The Sacred Memory Machine
 #  Inspired by Chitragupta, the Hindu God of Data
 #
@@ -215,7 +215,7 @@ install_deps() {
 download_files() {
   step "Downloading OpenYantra v${VERSION} files"
 
-  mkdir -p "$INSTALL_DIR"/{openclaw,examples,references,docs,UI/v4}
+  mkdir -p "$INSTALL_DIR"/{openyantra/adapters,examples,references,docs,UI/v4}
 
   FILES=(
     "openyantra/__init__.py"
@@ -240,15 +240,13 @@ download_files() {
     "openyantra/adapters/__init__.py"
     "openyantra/adapters/langchain.py"
     "openyantra/adapters/crewai.py"
+    "openyantra/adapters/openclaw.py"
     "openyantra/yantra_git.py"
     "openyantra/yantra_tui.py"
     "openyantra/desktop.py"
     "openyantra/cognitive_mcp.py"
     "openyantra/cognitive_db.py"
     "openyantra/chitrapat_template.ods"
-    "openclaw/hooks.py"
-    "openclaw/plugin.py"
-    "openclaw/__init__.py"
     "examples/bootstrap.py"
     "examples/langchain_adapter.py"
     "examples/__init__.py"
