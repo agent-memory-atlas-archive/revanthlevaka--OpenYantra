@@ -88,7 +88,7 @@ def test_register_verify_and_login(temp_env):
     reg_opt_resp = client.post("/api/passkey/register/options", json={"label": "Key 1"})
     reg_opt_data = reg_opt_resp.json()
     state_id = reg_opt_data["state_id"]
-    reg_opt_data["options"]["challenge"]
+    assert "challenge" in reg_opt_data["options"]
     
     # 2. Mock webauthn check verification
     mock_reg_verification = {

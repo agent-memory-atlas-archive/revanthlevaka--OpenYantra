@@ -49,7 +49,7 @@ def detect_version(path: str) -> str:
             if "🛡️ Security Log" in sheets or "📊 Stats" in sheets:
                 # Check for v2.9+ additions
                 try:
-                    df = xl.parse("🔓 Open Loops", header=0)
+                    xl.parse("🔓 Open Loops", header=0)
                     if "📒 Agrasandhanī" in sheets and "🔒 Quarantine" in sheets:
                         # Could be 2.9, 2.10, 2.11, 2.12 -- check Security Log
                         if "🛡️ Security Log" in sheets:

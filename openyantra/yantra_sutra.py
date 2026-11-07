@@ -339,7 +339,6 @@ class SutraCompiler:
         sheet_order = ["projects", "loops", "goals", "tasks", "preferences", "beliefs", "people"]
         for sec in sheet_order:
             if sec in grouped:
-                SECTION_TO_EMOJI[sec]
                 # Map section name to appropriate markdown header
                 header_map = {
                     "projects": "### Active Projects",

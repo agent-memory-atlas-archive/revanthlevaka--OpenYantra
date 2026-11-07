@@ -481,7 +481,6 @@ class OpenYantra:
                 settings_path = self.path.parent / "settings.json"
                 if settings_path.exists():
                     try:
-                        import json
                         with open(settings_path, "r", encoding="utf-8") as f:
                             s_data = json.load(f)
                         embedder_pref = s_data.get("embedder", "auto")
@@ -1061,7 +1060,6 @@ class OpenYantra:
             settings_path = self.path.parent / "settings.json"
             if settings_path.exists():
                 try:
-                    import json
                     with open(settings_path, "r", encoding="utf-8") as f:
                         s_data = json.load(f)
                     embedder_pref = s_data.get("embedder", "auto")
@@ -1767,7 +1765,6 @@ class OpenYantra:
             if principles:
                 lines.append("**My Principles & Constraints:**")
                 for b in principles[:5]:
-                    topic    = b.get("Topic", "?")
                     position = b.get("Position", "")
                     if position:
                         lines.append(f"- {position}")
@@ -1874,7 +1871,6 @@ class OpenYantra:
         settings = {}
         if settings_path.exists():
             try:
-                import json
                 with open(settings_path, "r", encoding="utf-8") as f:
                     settings = json.load(f)
             except Exception:
