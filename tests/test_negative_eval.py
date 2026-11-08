@@ -94,7 +94,7 @@ def test_completed_tasks_excluded_from_active_context(tmp_path):
     oy.add_task(task="Legacy cleanup task", project="Infra", priority="Low")
 
     # Mark legacy task Done
-    tasks = oy._read_sheet(SHEET_TASKS)
+    _unused_tasks = oy._read_sheet(SHEET_TASKS)
     req = WriteRequest(
         requesting_agent="User",
         sheet=SHEET_TASKS,
