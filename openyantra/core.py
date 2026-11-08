@@ -348,7 +348,7 @@ class LedgerAgent:
                         portalocker.unlock(self.f)
                         self.f.close()
                     except Exception:
-                        pass
+                        _oy_log.debug("failed to release workbook lock", exc_info=True)
         return _WLock(self.path.with_name(f".{self.path.name}.lock"))
 
     def _is_already_committed(self, request_id: str) -> bool:
