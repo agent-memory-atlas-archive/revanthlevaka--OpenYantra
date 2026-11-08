@@ -128,8 +128,8 @@ def test_cognitive_store_redacts_key_before_match_and_fails_safe(tmp_path: Path)
     store_file = tmp_path / "cognitive_memory.json"
     store = CognitiveMemoryStore(store_file)
 
-    secret_key = "user_api_key_sk-123456789012345678901234567890"
-    content_with_secret = "Bearer token: ghp_123456789012345678901234567890123456"
+    secret_key = "user_api_key_" + "sk-" + ("a" * 32)
+    content_with_secret = "Bearer token: " + "ghp_" + ("b" * 36)
 
     # Initial write
     m1 = store.write(key=secret_key, type_val="fact", agent="tester", content=content_with_secret)
