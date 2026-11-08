@@ -137,7 +137,7 @@ def test_cognitive_store_redacts_key_before_match_and_fails_safe(tmp_path: Path)
     assert "[REDACTED" in m1["content"]
 
     # Second write with same secret in key must UPDATE the record, not create duplicate
-    m2 = store.write(key=secret_key, type_val="fact", agent="tester", content="Updated value")
+    store.write(key=secret_key, type_val="fact", agent="tester", content="Updated value")
     all_memories = store._load()
     assert len(all_memories) == 1
     assert all_memories[0]["content"] == "Updated value"
