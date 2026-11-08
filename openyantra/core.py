@@ -64,6 +64,12 @@ except ImportError:
         _RAKSHA_AVAILABLE = False
         Raksha = None
 
+try:
+    import portalocker
+    _PORTALOCKER_AVAIL = True
+except ImportError:
+    _PORTALOCKER_AVAIL = False
+
 # ── Controlled vocabulary ──────────────────────────────────────────────────────
 
 PROJECT_STATUS = {"Active", "Paused", "Completed", "Cancelled"}
@@ -107,11 +113,17 @@ TODAY = date.today().isoformat()
 
 # ── Admission rules ────────────────────────────────────────────────────────────
 
-NOISE_PATTERNS = [
+NOISE_PHRASES = [
     "user said thanks", "user greeted", "user said hello",
-    "user said goodbye", "user said ok", "acknowledged",
-    "noted", "understood", "sure", "great", "awesome",
+    "user said goodbye", "user said ok", "user acknowledged",
 ]
+
+NOISE_STANDALONE_WORDS = {
+    "sure", "great", "awesome", "ok", "okay", "noted", "understood",
+    "acknowledged", "thanks", "thank you", "cool", "got it", "yep", "yes", "nope"
+}
+
+NOISE_PATTERNS = NOISE_PHRASES + list(NOISE_STANDALONE_WORDS)
 
 def _is_worth_remembering(fields: dict, sheet: str) -> tuple[bool, str]:
     """
@@ -122,11 +134,22 @@ def _is_worth_remembering(fields: dict, sheet: str) -> tuple[bool, str]:
     if sheet in (SHEET_SESSION_LOG, SHEET_LEDGER, SHEET_INBOX):
         return True, "always admit"
 
-    # Check for noise patterns (word-boundary matched to avoid false positives like 'ensure' matching 'sure')
-    text = " ".join(str(v).lower() for v in fields.values() if v)
-    for pattern in NOISE_PATTERNS:
-        if re.search(r'\b' + re.escape(pattern) + r'\b', text):
-            return False, f"noise pattern: '{pattern}'"
+    # Extract content-only fields (ignoring metadata like Importance/Priority/Status)
+    content_vals = [
+        str(v) for k, v in fields.items()
+        if k not in ("Importance", "Confidence", "Priority", "Status", "Source", "Added By", "Last Updated", "Deadline") and v
+    ]
+    text = " ".join(content_vals).lower()
+
+    # Check for multi-word noise phrases
+    for phrase in NOISE_PHRASES:
+        if phrase in text:
+            return False, f"noise pattern: '{phrase}'"
+
+    # Standalone filler: drop if input is conversational pleasantry (<= 2 words)
+    words = [w.strip(".,!?;:\"'") for w in text.split() if w.strip(".,!?;:\"'")]
+    if len(words) <= 2 and any(w in NOISE_STANDALONE_WORDS for w in words):
+        return False, f"conversational filler: '{text.strip()}'"
 
     # Require minimum content
     meaningful = [v for v in fields.values()
@@ -208,13 +231,35 @@ class WriteRequest:
 # ══════════════════════════════════════════════════════════════════════════════
 
 class WriteQueue:
-    """Sanchitta -- accumulated karma awaiting reckoning. Crash-safe."""
+    """Sanchitta -- accumulated karma awaiting reckoning. Crash-safe and multi-process locked."""
 
     def __init__(self, queue_path: Path):
         self.path  = queue_path
         self._lock = threading.Lock()
         if not self.path.exists():
             self._save([])
+
+    def _file_lock(self):
+        class _FLock:
+            def __init__(self, lock_path):
+                self.lock_path = lock_path
+                self.f = None
+            def __enter__(self):
+                if _PORTALOCKER_AVAIL:
+                    try:
+                        self.f = open(str(self.lock_path), "w")
+                        portalocker.lock(self.f, portalocker.LOCK_EX)
+                    except Exception:
+                        pass
+                return self
+            def __exit__(self, *args):
+                if _PORTALOCKER_AVAIL and self.f:
+                    try:
+                        portalocker.unlock(self.f)
+                        self.f.close()
+                    except Exception:
+                        pass
+        return _FLock(self.path.with_suffix(".lock"))
 
     def _load(self) -> list[dict]:
         try: return json.loads(self.path.read_text())
@@ -224,24 +269,29 @@ class WriteQueue:
         self.path.write_text(json.dumps(items, indent=2))
 
     def enqueue(self, req: WriteRequest):
-        with self._lock:
+        with self._lock, self._file_lock():
             items = self._load(); items.append(req.to_dict()); self._save(items)
 
     def dequeue_all(self) -> list[WriteRequest]:
-        with self._lock:
+        with self._lock, self._file_lock():
             items = self._load(); self._save([])
             return [WriteRequest.from_dict(d) for d in items]
 
     def acknowledge(self, request_id: str):
         """Remove a committed/processed write from the queue to prevent double replay."""
-        with self._lock:
+        with self._lock, self._file_lock():
             items = self._load()
             remaining = [d for d in items if d.get("request_id") != request_id]
             if len(remaining) != len(items):
                 self._save(remaining)
 
-    def peek(self) -> list[dict]: return self._load()
-    def is_empty(self) -> bool: return len(self._load()) == 0
+    def peek(self) -> list[dict]:
+        with self._lock, self._file_lock():
+            return self._load()
+
+    def is_empty(self) -> bool:
+        with self._lock, self._file_lock():
+            return len(self._load()) == 0
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -279,8 +329,27 @@ class LedgerAgent:
         elapsed = (time.time() - self._last_write_time) / 60
         return elapsed < self._dead_switch_mins
 
+    def _is_already_committed(self, request_id: str) -> bool:
+        """Check if request_id has already been recorded in Agrasandhanī ledger."""
+        try:
+            if not self.path.exists():
+                return False
+            with pd.ExcelFile(str(self.path), engine="odf") as xl:
+                if SHEET_LEDGER in xl.sheet_names:
+                    df = xl.parse(SHEET_LEDGER, header=0, dtype=str)
+                    if "Request ID" in df.columns:
+                        return str(request_id) in df["Request ID"].astype(str).values
+        except Exception:
+            _oy_log.debug("ignored error in idempotency check", exc_info=True)
+        return False
+
     def _process(self, req: WriteRequest) -> dict:
         with self._lock:
+            # Idempotency guard: skip if already committed to the ledger
+            if self._is_already_committed(req.request_id):
+                return {"status": "already_committed", "request_id": req.request_id,
+                        "sheet": req.sheet}
+
             # Admission gate (v2.1)
             if req.sheet not in (SHEET_SESSION_LOG, SHEET_LEDGER,
                                   SHEET_INBOX, SHEET_CORRECTIONS):
@@ -423,10 +492,17 @@ class LedgerAgent:
                             existing[name] = pd.DataFrame()
         except Exception: _oy_log.debug("ignored error", exc_info=True)
 
-        with pd.ExcelWriter(str(self.path), engine="odf") as writer:
-            for name, sdf in existing.items():
-                sdf.to_excel(writer, sheet_name=name, index=False, header=False)
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
+        import os
+        tmp = self.path.with_suffix(".tmp.ods")
+        try:
+            with pd.ExcelWriter(str(tmp), engine="odf") as writer:
+                for name, sdf in existing.items():
+                    sdf.to_excel(writer, sheet_name=name, index=False, header=False)
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+            os.replace(str(tmp), str(self.path))
+        except Exception:
+            tmp.unlink(missing_ok=True)
+            raise
 
     def _log_audit(self, req: WriteRequest, status: str,
                    reason: str = "", signature: str = ""):
@@ -1014,7 +1090,7 @@ class OpenYantra:
         return {
             "identity": id_map, "agent_instructions": instructions,
             "active_projects": projects, "open_loops": open_loops,
-            "active_goals": goals, "pending_tasks": tasks,
+            "active_goals": goals, "pending_tasks": tasks, "tasks": tasks,
             "pending_corrections": corrections, "inbox_pending": inbox_count,
         }
 

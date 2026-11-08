@@ -10,6 +10,10 @@ from openyantra.core import OpenYantra, _is_worth_remembering, SHEET_TASKS
 
 
 def test_noise_admission_word_boundary():
+    # 'Make sure' in a real sentence must be admitted
+    admit, reason = _is_worth_remembering({"Task": "Make sure the backup runs nightly", "Importance": 7}, SHEET_TASKS)
+    assert admit is True, f"Failed: {reason}"
+
     # 'Ensure' should NOT trigger 'sure'
     admit, reason = _is_worth_remembering({"Task": "Ensure the backup runs nightly", "Importance": 7}, SHEET_TASKS)
     assert admit is True, f"Failed: {reason}"
@@ -18,10 +22,15 @@ def test_noise_admission_word_boundary():
     admit, reason = _is_worth_remembering({"Task": "Assure compliance with SOC2 standards", "Importance": 7}, SHEET_TASKS)
     assert admit is True, f"Failed: {reason}"
 
-    # Exact noise word 'sure' SHOULD be dropped
-    admit, reason = _is_worth_remembering({"Task": "Sure thing boss", "Importance": 3}, SHEET_TASKS)
+    # Conversational filler 'sure' SHOULD be dropped
+    admit, reason = _is_worth_remembering({"Task": "Sure", "Importance": 3}, SHEET_TASKS)
     assert admit is False
-    assert "noise pattern: 'sure'" in reason
+    assert "conversational filler" in reason
+
+    # Two-word conversational filler 'Sure thing' SHOULD be dropped
+    admit, reason = _is_worth_remembering({"Task": "Sure thing", "Importance": 3}, SHEET_TASKS)
+    assert admit is False
+    assert "conversational filler" in reason
 
     # 'User said thanks' SHOULD be dropped
     admit, reason = _is_worth_remembering({"Task": "User said thanks for the help", "Importance": 3}, SHEET_TASKS)
@@ -78,3 +87,48 @@ def test_route_inbox_long_content(tmp_path):
     assert len(inbox_after) == 1
     assert inbox_after[0].get("Routed?") == "Yes"
     assert inbox_after[0].get("Content") == long_content
+
+
+def test_cognitive_db_store_level_redaction(tmp_path):
+    from openyantra.cognitive_db import CognitiveMemoryStore
+    db_file = tmp_path / "cognitive_memories.json"
+    store = CognitiveMemoryStore(db_file)
+
+    secret = "sk-ant-api03-abcdef1234567890abcdef1234567890abcdef12345678"
+    # Write directly through CognitiveMemoryStore
+    store.write(key="dashboard-key", type_val="fact", agent="Dashboard", content=f"Anthropic key: {secret}")
+
+    mem = store.read("dashboard-key")
+    assert mem is not None
+    assert secret not in mem["content"]
+    assert "[REDACTED_API_KEY:anthropic:" in mem["content"]
+
+
+def test_write_queue_idempotency_skip_reapplying_committed(tmp_path):
+    from openyantra.core import WriteRequest, SHEET_TASKS
+    oy_file = tmp_path / "chitrapat.ods"
+    oy = OpenYantra(oy_file)
+    oy.bootstrap(user_name="Audit Tester", occupation="Engineer")
+
+    req = WriteRequest(
+        requesting_agent="TestAgent",
+        sheet=SHEET_TASKS,
+        operation="add",
+        fields={"Task": "Single commit test task", "Priority": "Medium"},
+        confidence="High",
+        source="Agent-observed",
+        importance=6
+    )
+
+    # First write
+    receipt1 = oy.request_write(req)
+    assert receipt1["status"] == "written"
+
+    # Simulate crash-replay of the identical WriteRequest
+    receipt2 = oy._ledger._process(req)
+    assert receipt2["status"] == "already_committed"
+
+    # Verify task only appears once
+    tasks = oy.get_sheet("tasks")
+    matching = [t for t in tasks if t.get("Task") == "Single commit test task"]
+    assert len(matching) == 1

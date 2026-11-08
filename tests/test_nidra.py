@@ -39,10 +39,19 @@ def test_nidra_detect_and_promote_preferences(mock_oy):
         topics=["Architecture"],
         decisions=["User prefers dark mode across all interfaces", "rule: always write python unit tests"]
     )
-    # Log a reverted decision that should NOT be promoted
+    # Log an original decision that was subsequently reverted in a later session
+    mock_oy.log_session(
+        topics=["Indentation decision"],
+        decisions=["Always use tabs for indentation"]
+    )
     mock_oy.log_session(
         topics=["Reverted Database Experiment"],
         decisions=["Reverted / Superseded Decision: user prefers Postgres over SQLite"],
+        notes="Status: REVERTED"
+    )
+    mock_oy.log_session(
+        topics=["Reverted Indentation"],
+        decisions=["Reverted / Superseded Decision: always use tabs for indentation"],
         notes="Status: REVERTED"
     )
     nidra = NidraConsolidator(mock_oy)
@@ -52,6 +61,8 @@ def test_nidra_detect_and_promote_preferences(mock_oy):
     assert found_dark_mode
     found_reverted = any("postgres" in c["Belief / Principle"].lower() for c in candidates)
     assert not found_reverted, "Reverted decision should not be promoted into beliefs"
+    found_reverted_tabs = any("tabs" in c["Belief / Principle"].lower() for c in candidates)
+    assert not found_reverted_tabs, "Original commit whose decision was later reverted should not be promoted"
 
 
 
@@ -98,4 +109,17 @@ def test_nidra_full_consolidation_heuristic(mock_oy):
     
     # Verify the belief actually landed in the sheet
     beliefs = mock_oy.get_sheet("beliefs")
-    assert any("clean code" in str(b.get("Position", "")).lower() for b in beliefs)
+    clean_code_beliefs = [b for b in beliefs if "clean code" in str(b.get("Position", "")).lower()]
+    assert len(clean_code_beliefs) == 1
+
+    # Verify each belief gets a unique topic, not a shared generic topic
+    for b in clean_code_beliefs:
+        assert b.get("Topic", "").lower().startswith("pref: clean code")
+
+    # Second consolidation: must NOT duplicate already promoted preferences
+    result2 = nidra.consolidate(dry_run=False, provider="heuristic")
+    assert len(result2["promoted_preferences"]) == 0
+
+    beliefs_after = mock_oy.get_sheet("beliefs")
+    clean_code_after = [b for b in beliefs_after if "clean code" in str(b.get("Position", "")).lower()]
+    assert len(clean_code_after) == 1, "Belief was duplicated on repeated consolidation!"

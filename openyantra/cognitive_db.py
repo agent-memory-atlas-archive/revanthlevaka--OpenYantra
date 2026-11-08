@@ -68,6 +68,15 @@ class CognitiveMemoryStore:
                 found_idx = idx
                 break
 
+        # Store-level secret redaction via Raksha guard
+        try:
+            from openyantra.yantra_security import Raksha
+            _raksha = Raksha()
+            content, _ = _raksha.redact_secrets(str(content or ""))
+            key, _ = _raksha.redact_secrets(str(key or ""))
+        except Exception:
+            pass
+
         new_memory = {
             "key": key.strip(), # Keep original casing of first insert/latest update
             "type": type_val,

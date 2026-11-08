@@ -104,14 +104,20 @@ class NidraConsolidator:
     def detect_promotable_preferences(self) -> List[Dict[str, str]]:
         """
         Scans recent session logs and inbox notes for recurring user preferences or principles
-        that should be promoted into the Beliefs & Principles sheet.
+        that should be promoted into the Beliefs sheet.
         """
         from openyantra.core import SHEET_BELIEFS
         existing_beliefs = self.oy.get_sheet(SHEET_BELIEFS)
-        known_statements = {
-            str(b.get("Position") or b.get("Belief / Principle") or "").strip().lower()
-            for b in existing_beliefs if (b.get("Position") or b.get("Belief / Principle"))
-        }
+        known_statements = set()
+        for b in existing_beliefs:
+            pos = str(b.get("Position") or b.get("Belief / Principle") or "").strip().lower()
+            if pos:
+                known_statements.add(pos)
+                if pos.startswith("user preference:"):
+                    known_statements.add(pos[len("user preference:"):].strip())
+            top = str(b.get("Topic") or "").strip().lower()
+            if top:
+                known_statements.add(top)
 
         sessions = self.oy.get_sheet("Session Log")
         inbox_items = self.oy.get_sheet("Inbox")
@@ -122,17 +128,36 @@ class NidraConsolidator:
             re.IGNORECASE
         )
 
+        # Collect reverted / superseded decisions across all recent sessions to exclude undone choices
+        reverted_phrases = set()
+        for s in sessions[-30:]:
+            dec_text = str(s.get("Decisions Made") or s.get("Decisions") or s.get("Decisions / Outputs") or "")
+            notes = str(s.get("Notes") or "")
+            if "reverted" in dec_text.lower() or "superseded" in dec_text.lower() or "reverted" in notes.lower():
+                clean_rev = re.sub(r'(?:reverted\s*(?:/\s*superseded)?\s*decision:?|status:\s*reverted)', '', dec_text, flags=re.IGNORECASE).strip().lower()
+                if clean_rev:
+                    reverted_phrases.add(clean_rev)
+                for part in dec_text.split(";"):
+                    if "reverted" in part.lower():
+                        p_clean = re.sub(r'reverted\s*(?:/\s*superseded)?\s*decision:?', '', part, flags=re.IGNORECASE).strip().lower()
+                        if p_clean:
+                            reverted_phrases.add(p_clean)
+
         texts_to_scan = []
         for s in sessions[-30:]:
             dec_text = str(s.get("Decisions Made") or s.get("Decisions") or s.get("Decisions / Outputs") or "")
-            # Skip scanning reverted / superseded decisions so undone choices are not promoted
-            if "reverted" in dec_text.lower() or "superseded" in dec_text.lower():
+            notes = str(s.get("Notes") or "")
+            # Skip session if marked reverted
+            if "reverted" in dec_text.lower() or "superseded" in dec_text.lower() or "reverted" in notes.lower():
+                continue
+            dec_lower = dec_text.lower()
+            if any(rev and (rev in dec_lower or dec_lower in rev) for rev in reverted_phrases):
                 continue
             texts_to_scan.append(dec_text)
             texts_to_scan.append(str(s.get("Topics Discussed") or s.get("Topic") or ""))
             texts_to_scan.append(str(s.get("Notes") or s.get("Next Actions") or ""))
         for i in inbox_items[-20:]:
-            texts_to_scan.append(str(i.get("Item") or i.get("Raw Input") or ""))
+            texts_to_scan.append(str(i.get("Item") or i.get("Raw Input") or i.get("Content") or ""))
 
         for text in texts_to_scan:
             if not text or text.lower() == "nan":
@@ -140,15 +165,28 @@ class NidraConsolidator:
             matches = preference_regex.findall(text)
             for m in matches:
                 clean_pref = m.strip()
-                if len(clean_pref) > 8 and clean_pref.lower() not in known_statements:
+                clean_lower = clean_pref.lower()
+                # Skip if preference was part of an undone / reverted decision
+                if any(rev and (rev in clean_lower or clean_lower in rev) for rev in reverted_phrases):
+                    continue
+
+                if (len(clean_pref) > 8 and
+                    clean_lower not in known_statements and
+                    f"user preference: {clean_lower}" not in known_statements):
+
+                    topic_title = f"Pref: {clean_pref.strip()[:35]}"
                     candidate = {
-                        "Belief / Principle": f"User Preference: {clean_pref}",
+                        "Topic": topic_title,
+                        "Belief / Principle": f"User Preference: {clean_pref.strip()}",
+                        "Position": f"User Preference: {clean_pref.strip()}",
                         "Domain": "Operational",
                         "Confidence": "High",
                         "Source": "Nidra Session Consolidation"
                     }
                     if candidate not in candidates:
                         candidates.append(candidate)
+                        known_statements.add(clean_lower)
+                        known_statements.add(f"user preference: {clean_lower}")
 
         return candidates
 
@@ -223,13 +261,14 @@ class NidraConsolidator:
         if not dry_run and promoted:
             for p in promoted:
                 from openyantra.core import WriteRequest, SHEET_BELIEFS
-                belief_text = p.get("Belief / Principle") or p.get("Position") or ""
+                belief_text = p.get("Position") or p.get("Belief / Principle") or ""
+                topic = p.get("Topic") or f"Pref: {belief_text[:35]}"
                 req = WriteRequest(
                     requesting_agent="NidraConsolidator",
                     sheet=SHEET_BELIEFS,
                     operation="add",
                     fields={
-                        "Topic": p.get("Domain", "Operational"),
+                        "Topic": topic,
                         "Position": belief_text,
                         "Confidence": p.get("Confidence", "High"),
                         "Domain": p.get("Domain", "Operational"),
@@ -239,6 +278,7 @@ class NidraConsolidator:
                         "Importance": 8,
                         "Contradiction_Flag": "No"
                     },
+                    row_identifier=topic,
                     confidence="High",
                     source="Agent-inferred",
                     importance=8
