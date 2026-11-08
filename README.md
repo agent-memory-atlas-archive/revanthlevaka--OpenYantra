@@ -27,6 +27,12 @@
   <img src="assets/brand/banner-github.svg" alt="OpenYantra Banner" width="100%"/>
 </p>
 
+<p align="center">
+  <img src="assets/demo_cross_app_memory.gif" alt="OpenYantra Cross-App Persistent Memory Demo" width="100%"/>
+  <br/>
+  <em>Capture decisions in Cursor (<code>Cmd+Shift+Y</code>) & git commits → Instant recall in fresh Claude Desktop sessions with strict workspace isolation.</em>
+</p>
+
 ---
 
 ## The Problem -- Why Your AI Forgets (Session Amnesia)
