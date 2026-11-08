@@ -10,7 +10,7 @@ Comprehensive verification tests for Simon Strandgaard's round 3 audit findings:
 import pytest
 from unittest.mock import patch
 from pathlib import Path
-from openyantra.core import OpenYantra, WriteRequest, SHEET_BELIEFS, SHEET_SESSION_LOG, SHEET_LEDGER, _PORTALOCKER_AVAIL
+from openyantra.core import OpenYantra, WriteRequest, SHEET_BELIEFS, SHEET_LEDGER, _PORTALOCKER_AVAIL
 from openyantra.yantra_nidra import NidraConsolidator
 from openyantra.cognitive_db import CognitiveMemoryStore
 
