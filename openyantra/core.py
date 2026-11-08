@@ -340,7 +340,7 @@ class LedgerAgent:
                         self.f = open(str(self.lock_path), "w")
                         portalocker.lock(self.f, portalocker.LOCK_EX)
                     except Exception:
-                        pass
+                        _oy_log.debug("workbook lock unavailable; continuing without lock", exc_info=True)
                 return self
             def __exit__(self, exc_type, exc_val, exc_tb):
                 if self.f:
