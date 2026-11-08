@@ -1,6 +1,5 @@
 """Tests for first-class decision lineage and Superseded_By tracking."""
 
-import pytest
 from pathlib import Path
 from openyantra.core import OpenYantra, WriteRequest, SHEET_BELIEFS
 
