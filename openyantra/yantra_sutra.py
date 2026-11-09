@@ -11,6 +11,11 @@ from typing import Any, Optional
 import logging as _oy_logging
 _oy_log = _oy_logging.getLogger("openyantra")
 
+try:
+    from openyantra.core import is_superseded
+except ImportError:
+    def is_superseded(r): return False
+
 EMOJI_TO_SECTION = {
     "👤 Identity": "identity",
     "🎯 Goals": "goals",
@@ -238,6 +243,8 @@ class SutraCompiler:
                 rows = [r for r in rows if r.get("Status") in ("Active", "In Progress")]
             elif sec_name == "tasks":
                 rows = [r for r in rows if r.get("Status") not in ("Done", None)]
+            elif sec_name == "beliefs":
+                rows = [r for r in rows if not is_superseded(r)]
 
             for row in rows:
                 if not any(v for v in row.values() if v and str(v).strip()):
