@@ -28,7 +28,7 @@ _oy_log = _oy_logging.getLogger("openyantra")
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from openyantra import OpenYantra, SHEET_PEOPLE, SHEET_PREFERENCES, SHEET_BELIEFS, is_superseded
+    from openyantra import OpenYantra, SHEET_PEOPLE, SHEET_PREFERENCES, SHEET_BELIEFS
     _OY_AVAILABLE = True
 except ImportError:
     _OY_AVAILABLE = False
@@ -147,7 +147,7 @@ def build_context_markdown(oy: "OpenYantra",
     if "beliefs" in sections:
         beliefs = oy._read_sheet(SHEET_BELIEFS)
         key_beliefs = [b for b in beliefs
-                       if not is_superseded(b) and int(b.get("Importance", 5) or 5) >= 7][:5]
+                       if int(b.get("Importance", 5) or 5) >= 7][:5]
         if key_beliefs:
             lines.append("### Key Beliefs & Principles")
             for b in key_beliefs:
