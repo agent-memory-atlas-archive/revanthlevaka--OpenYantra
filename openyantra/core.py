@@ -75,6 +75,7 @@ except ImportError:
 PROJECT_STATUS = {"Active", "Paused", "Completed", "Cancelled"}
 TASK_STATUS    = {"Pending", "In Progress", "Done", "Blocked"}
 GOAL_STATUS    = {"Active", "In Progress", "Achieved", "Abandoned"}
+BELIEF_STATUS  = {"Active", "Superseded", "Reverted", "Dormant"}
 PRIORITY       = {"Critical", "High", "Medium", "Low"}
 RESOLVED       = {"Yes", "No"}
 STRENGTH       = {"Strong", "Mild", "Uncertain"}
@@ -168,6 +169,34 @@ def _is_worth_remembering(fields: dict, sheet: str) -> tuple[bool, str]:
     return True, "admitted"
 
 
+def is_superseded(row: dict) -> bool:
+    """
+    Check if a belief, principle, or memory record has been superseded or invalidated.
+    
+    Handles None, empty strings, NaN, whitespace, and successor strings like
+    'Reverted in session log', 'Superseded by ...', as well as Status='Superseded'.
+    """
+    if not isinstance(row, dict):
+        return False
+    sup = row.get("Superseded_By")
+    if sup is not None:
+        if isinstance(sup, float):
+            import math
+            if not (math.isnan(sup) or math.isinf(sup)):
+                return True
+        else:
+            s = str(sup).strip()
+            if s and s.lower() not in ("none", "nan", "null", "false", "no", "0"):
+                return True
+    flag = str(row.get("Contradiction_Flag", "") or "").strip().lower()
+    if flag.startswith("superseded"):
+        return True
+    status = str(row.get("Status", "") or "").strip().lower()
+    if status in ("superseded", "reverted"):
+        return True
+    return False
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # WriteRequest (Karma-Lekha)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -230,36 +259,71 @@ class WriteRequest:
 # WriteQueue (Sanchitta)
 # ══════════════════════════════════════════════════════════════════════════════
 
+_PROCESS_FILE_LOCKS: dict[str, dict] = {}
+_PROCESS_LOCKS_GUARD = threading.Lock()
+
+class _ReentrantFileLock:
+    """
+    Process-wide, thread-safe, re-entrant file lock.
+    
+    Prevents self-deadlock under POSIX fcntl.flock when nested routines in the
+    same process or thread re-enter the lock for the same file path (e.g., _process
+    handling rejected or conflicting writes calling _log_audit -> _write_sheet).
+    """
+    def __init__(self, lock_path: Path):
+        self.lock_path = Path(lock_path).resolve()
+        key = str(self.lock_path)
+        with _PROCESS_LOCKS_GUARD:
+            if key not in _PROCESS_FILE_LOCKS:
+                _PROCESS_FILE_LOCKS[key] = {
+                    "thread_lock": threading.RLock(),
+                    "depth": 0,
+                    "file": None
+                }
+            self._entry = _PROCESS_FILE_LOCKS[key]
+
+    def __enter__(self):
+        self._entry["thread_lock"].acquire()
+        if self._entry["depth"] == 0:
+            if _PORTALOCKER_AVAIL:
+                try:
+                    self._entry["file"] = open(str(self.lock_path), "a+")
+                    portalocker.lock(self._entry["file"], portalocker.LOCK_EX)
+                except Exception:
+                    _oy_log.debug("file lock unavailable; continuing without lock", exc_info=True)
+                    self._entry["file"] = None
+        self._entry["depth"] += 1
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            self._entry["depth"] -= 1
+            if self._entry["depth"] <= 0:
+                self._entry["depth"] = 0
+                f = self._entry["file"]
+                if f:
+                    try:
+                        portalocker.unlock(f)
+                        f.close()
+                    except Exception:
+                        _oy_log.debug("failed to release file lock", exc_info=True)
+                    finally:
+                        self._entry["file"] = None
+        finally:
+            self._entry["thread_lock"].release()
+
+
 class WriteQueue:
     """Sanchitta -- accumulated karma awaiting reckoning. Crash-safe and multi-process locked."""
 
     def __init__(self, queue_path: Path):
         self.path  = queue_path
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         if not self.path.exists():
             self._save([])
 
     def _file_lock(self):
-        class _FLock:
-            def __init__(self, lock_path):
-                self.lock_path = lock_path
-                self.f = None
-            def __enter__(self):
-                if _PORTALOCKER_AVAIL:
-                    try:
-                        self.f = open(str(self.lock_path), "w")
-                        portalocker.lock(self.f, portalocker.LOCK_EX)
-                    except Exception:
-                        pass
-                return self
-            def __exit__(self, *args):
-                if _PORTALOCKER_AVAIL and self.f:
-                    try:
-                        portalocker.unlock(self.f)
-                        self.f.close()
-                    except Exception:
-                        pass
-        return _FLock(self.path.with_suffix(".lock"))
+        return _ReentrantFileLock(self.path.with_suffix(".lock"))
 
     def _load(self) -> list[dict]:
         try: return json.loads(self.path.read_text())
@@ -308,7 +372,7 @@ class LedgerAgent:
                  dead_switch_minutes: int = 30):
         self.path              = memory_path
         self.queue             = queue
-        self._lock             = threading.Lock()
+        self._lock             = threading.RLock()
         self._last_write_time  = time.time()
         self._dead_switch_mins = dead_switch_minutes
 
@@ -330,26 +394,7 @@ class LedgerAgent:
         return elapsed < self._dead_switch_mins
 
     def _workbook_lock(self):
-        class _WLock:
-            def __init__(self, lock_path):
-                self.lock_path = lock_path
-                self.f = None
-            def __enter__(self):
-                if _PORTALOCKER_AVAIL:
-                    try:
-                        self.f = open(str(self.lock_path), "w")
-                        portalocker.lock(self.f, portalocker.LOCK_EX)
-                    except Exception:
-                        _oy_log.debug("workbook lock unavailable; continuing without lock", exc_info=True)
-                return self
-            def __exit__(self, exc_type, exc_val, exc_tb):
-                if self.f:
-                    try:
-                        portalocker.unlock(self.f)
-                        self.f.close()
-                    except Exception:
-                        _oy_log.debug("failed to release workbook lock", exc_info=True)
-        return _WLock(self.path.with_name(f".{self.path.name}.lock"))
+        return _ReentrantFileLock(self.path.with_name(f".{self.path.name}.lock"))
 
     def _is_already_committed(self, request_id: str) -> bool:
         """Check if request_id has already been recorded in Agrasandhanī ledger."""
@@ -412,7 +457,7 @@ class LedgerAgent:
         if req.sheet == SHEET_LEDGER:
             return {"status": "rejected", "reason": "Agrasandhanī is system-managed"}
         vocab = {
-            "Status":     PROJECT_STATUS | TASK_STATUS | GOAL_STATUS,
+            "Status":     PROJECT_STATUS | TASK_STATUS | GOAL_STATUS | BELIEF_STATUS,
             "Priority":   PRIORITY, "Resolved?": RESOLVED,
             "Strength":   STRENGTH, "Confidence": CONFIDENCE_V,
             "Sentiment":  SENTIMENT,
@@ -870,7 +915,7 @@ class OpenYantra:
         Called monthly or at session start.
         """
         contradictions = []
-        beliefs = self._read_sheet(SHEET_BELIEFS)
+        beliefs = [b for b in self._read_sheet(SHEET_BELIEFS) if not is_superseded(b)]
         self._read_sheet(SHEET_IDENTITY)
 
         # Simple contradiction detection: same topic, different positions
@@ -1179,8 +1224,7 @@ class OpenYantra:
         # Core beliefs & principles (Dhāraṇā) -- active only (exclude superseded)
         beliefs = [
             r for r in self._read_sheet(SHEET_BELIEFS)
-            if not r.get("Superseded_By")
-            and not str(r.get("Contradiction_Flag", "")).lower().startswith("superseded")
+            if not is_superseded(r)
         ]
 
         return {
@@ -1248,7 +1292,8 @@ class OpenYantra:
 
     def search(self, query: str, top_k: int = 5, sheets: list = None,
                snapshot_mode: str = None, hybrid_alpha: float = 0.7,
-               importance_weight: float = 0.3) -> list[dict]:
+               importance_weight: float = 0.3,
+               include_superseded: bool = False) -> list[dict]:
         """
         VidyaKosha semantic search -- v2.7: importance-weighted results.
 
@@ -1277,7 +1322,15 @@ class OpenYantra:
         results = self._vidyakosha.query(
             text=query, agent_name=self.agent_name, top_k=top_k * 3,
             sheets=sheets, snapshot_mode=snapshot_mode or "live",
-            hybrid_alpha=hybrid_alpha)
+            hybrid_alpha=hybrid_alpha,
+            include_superseded=include_superseded)
+
+        # Exclude superseded rows unless explicitly requested
+        if not include_superseded and results:
+            results = [
+                r for r in results
+                if not is_superseded(r.get("row") if isinstance(r.get("row"), dict) else {})
+            ]
 
         # v2.7 -- re-rank by importance × relevance × recency
         if importance_weight > 0 and results:
@@ -1961,10 +2014,11 @@ class OpenYantra:
         if include_beliefs:
             beliefs = self._fast_read_sheet(
                 SHEET_BELIEFS,
-                cols=["Topic", "Position", "Domain", "Confidence"]
+                cols=["Topic", "Position", "Domain", "Confidence", "Superseded_By", "Contradiction_Flag", "Status"]
             )
             principles = [b for b in beliefs
-                         if b.get("Domain") in ("Values", "Constraints")
+                         if not is_superseded(b)
+                         and b.get("Domain") in ("Values", "Constraints")
                          and b.get("Confidence") in ("High", None, "nan")]
             if principles:
                 lines.append("**My Principles & Constraints:**")
