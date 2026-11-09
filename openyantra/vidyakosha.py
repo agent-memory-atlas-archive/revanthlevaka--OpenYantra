@@ -360,17 +360,19 @@ class VidyaKosha:
         sheets: Optional[list[str]] = None,
         snapshot_mode: str = "live",
         hybrid_alpha: float = 0.7,
+        include_superseded: bool = False,
     ) -> list[dict]:
         """
         Hybrid semantic + keyword search across the Chitrapat.
 
         Args:
-            text:           Natural language query
-            agent_name:     Name of the requesting agent
-            top_k:          Number of results to return
-            sheets:         Filter to specific sheets (None = all)
-            snapshot_mode:  "live" | "per-session" | configurable
-            hybrid_alpha:   Weight for vector score vs BM25 (0=BM25 only, 1=vector only)
+            text:               Natural language query
+            agent_name:         Name of the requesting agent
+            top_k:              Number of results to return
+            sheets:             Filter to specific sheets (None = all)
+            snapshot_mode:      "live" | "per-session" | configurable
+            hybrid_alpha:       Weight for vector score vs BM25 (0=BM25 only, 1=vector only)
+            include_superseded: Whether to include superseded/reverted items (default: False)
 
         Returns:
             List of result dicts sorted by hybrid score:
@@ -427,14 +429,21 @@ class VidyaKosha:
         hybrid.sort(key=lambda x: -x[1])
 
         results = []
-        for idx, hs, vs, bs in hybrid[:top_k]:
+        for idx, hs, vs, bs in hybrid:
             if idx >= len(registry):
                 continue
             rec = registry[idx].copy()
+            if not include_superseded:
+                from openyantra.core import is_superseded
+                row_data = rec.get("row")
+                if isinstance(row_data, dict) and is_superseded(row_data):
+                    continue
             rec["score"]        = round(hs, 4)
             rec["vector_score"] = round(vs, 4)
             rec["bm25_score"]   = round(bs, 4)
             results.append(rec)
+            if len(results) >= top_k:
+                break
 
         return results
 
